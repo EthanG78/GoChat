@@ -7,24 +7,24 @@ import (
 )
 
 type hub struct {
-	//mutex that protects connections
-	connectionMx sync.RWMutex
+	// the mutex to protect connections
+	connectionsMx sync.RWMutex
 
-	//Registered connections
+	// Registered connections.
 	connections map[*connection]struct{}
 
-	//Messages from connections.
+	// Inbound messages from the connections.
 	broadcast chan []byte
 
 	logMx sync.RWMutex
-	log	[][]byte
+	log   [][]byte
 }
 
-func newHub() *hub{
+func newHub() *hub {
 	h := &hub{
 		connectionsMx: sync.RWMutex{},
-		broadcast: make(chan []byte),
-		connections: make(map[*connection]struct{}),
+		broadcast:     make(chan []byte),
+		connections:   make(map[*connection]struct{}),
 	}
 
 	go func() {
@@ -34,30 +34,29 @@ func newHub() *hub{
 			for c := range h.connections {
 				select {
 				case c.send <- msg:
-					//stop trying to send this connection after trying for 1 second
-					//if we have tos top, it means that a reader dies to remove the connection also
-				case <- time.After(1 * time.Second):
+				// stop trying to send to this connection after trying for 1 second.
+				// if we have to stop, it means that a reader died so remove the connection also.
+				case <-time.After(1 * time.Second):
 					log.Printf("shutting down connection %s", c)
-					h.removeConnections(c)
+					h.removeConnection(c)
 				}
 			}
-			h.connectionMx.RUnlock()
+			h.connectionsMx.RUnlock()
 		}
 	}()
 	return h
 }
 
-
-func (h *hub) addConnection(conn *connection){
-	h.connectionMx.Lock()
-	defer h.connectionMx.Unlock()
-	h.connections[conn] = struct {}{}
+func (h *hub) addConnection(conn *connection) {
+	h.connectionsMx.Lock()
+	defer h.connectionsMx.Unlock()
+	h.connections[conn] = struct{}{}
 }
 
-func (h *hub) removeConnection(conn *connection){
-	h.connectionMx.Lock()
-	defer h.connectionMx.Unlock()
-	if _, ok := h.connections[conn]; ok{
+func (h *hub) removeConnection(conn *connection) {
+	h.connectionsMx.Lock()
+	defer h.connectionsMx.Unlock()
+	if _, ok := h.connections[conn]; ok {
 		delete(h.connections, conn)
 		close(conn.send)
 	}
