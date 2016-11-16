@@ -46,3 +46,19 @@ func newHub() *hub{
 	}()
 	return h
 }
+
+
+func (h *hub) addConnection(conn *connection){
+	h.connectionMx.Lock()
+	defer h.connectionMx.Unlock()
+	h.connections[conn] = struct {}{}
+}
+
+func (h *hub) removeConnection(conn *connection){
+	h.connectionMx.Lock()
+	defer h.connectionMx.Unlock()
+	if _, ok := h.connections[conn]; ok{
+		delete(h.connections, conn)
+		close(conn.send)
+	}
+}
