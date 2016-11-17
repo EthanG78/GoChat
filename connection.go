@@ -1,12 +1,11 @@
-package controller
-
+package main
 
 import (
-"log"
-"net/http"
-"sync"
+	"log"
+	"net/http"
+	"sync"
 
-"github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 )
 
 type connection struct {
