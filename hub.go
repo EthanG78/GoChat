@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"log"
 	"sync"
@@ -60,4 +61,4 @@ func (h *hub) removeConnection(conn *connection) {
 		delete(h.connections, conn)
 		close(conn.send)
 	}
-}
+}*/

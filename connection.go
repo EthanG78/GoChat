@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"log"
 	"net/http"
@@ -7,7 +8,9 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+*/
 
+/*
 type connection struct {
 	// Buffered channel of outbound messages.
 	send chan []byte
@@ -58,4 +61,4 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	go c.reader(&wg, wsConn)
 	wg.Wait()
 	wsConn.Close()
-}
+}*/
