@@ -140,7 +140,7 @@ func homeHandler(tpl *template.Template) http.Handler {
 
 func main() {
 	flag.Parse()
-	tpl := template.Must(template.ParseFiles("template/main.html"))
+	tpl := template.Must(template.ParseFiles("home.html"))
 	h := newHub()
 	router := http.NewServeMux()
 	router.Handle("/", homeHandler(tpl))
