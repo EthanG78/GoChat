@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"text/template"
 	"sync"
+	"time"
+	"net"
 
 	"github.com/gorilla/websocket"
 
-	"time"
+
 )
 
 //////////////////////
@@ -111,6 +113,23 @@ type wsHandler struct {
 }
 
 func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	//Update ip's with syntax "HOST:PORT"
+	var bannedIp []string
+	bannedIp = append(bannedIp, "")
+
+	//Finds user IP
+	ip,_,_ := net.SplitHostPort(r.RemoteAddr)
+	log.Printf("%s has connected.", ip)
+
+	//Checks to see if user IP matches slice of banned IP's
+	for i := range bannedIp{
+		if bannedIp[i] == ip{
+			log.Printf("%s has been banned from the web server", ip)
+			http.Error(w, "BANNED", http.StatusUnauthorized)
+			return
+		}
+	}
 	wsConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("error upgrading %s", err)
@@ -131,6 +150,25 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 //////////////////////
 //MAIN
 /////////////////////
+
+
+/*//Must use this syntax for adding banned ip's "host:port"
+var bannedIp []string
+
+func banUser (res http.ResponseWriter, req *http.Request){
+	//Grabs clients IP address
+	ip,_,_ := net.SplitHostPort(req.RemoteAddr)
+
+	for i := range bannedIp{
+		if i == ip {
+			log.Printf("%s has been banned from the web server", ip)
+			log.Fatal()
+
+		}
+	}
+
+
+}*/
 
 func homeHandler(tpl *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
