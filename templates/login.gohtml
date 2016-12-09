@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>Chat Login</title>
+</head>
+<body>
+   {{if .UserName}}
+   <h1>You are logged in</h1>
+   USERNAME: {{.UserName}}<br>
+   PASSWORD: {{.Pass}}<br>
+   FIRST: {{.First}}
+   LAST: {{.Last}}
+   {{else}}
+   <h1>LOGIN</h1>
+   <form method="post">
+      <input type="text" name="username" placeholder="email">
+      <input type="password" name="password" placeholder="password">
+      <input type="submit">
+   </form>
+   {{end}}
+</body>
+</html>
