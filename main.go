@@ -10,8 +10,7 @@ import (
 	"net"
 
 	"github.com/gorilla/websocket"
-
-
+	"github.com/satori/go.uuid"
 )
 
 //////////////////////
@@ -114,10 +113,13 @@ type wsHandler struct {
 
 func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
+
+
+	//BAN USERS HERE!
 	//Update ip's with syntax "HOST:PORT"
 	var bannedIp []string
 	bannedIp = append(bannedIp, "")
-
+	/////////////
 	//Finds user IP
 	ip,_,_ := net.SplitHostPort(r.RemoteAddr)
 	log.Printf("%s has connected.", ip)
@@ -130,7 +132,7 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
+	//////////
 
 	wsConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -153,24 +155,54 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 //MAIN
 /////////////////////
 
+type user struct {
+	UserName string
+	Pass string
+	First string
+	Last string
+}
 
-/*//Must use this syntax for adding banned ip's "host:port"
-var bannedIp []string
+var dbUsers = map[string]user{}
+var dbSessions = map[string]string{}
+var tpl *template.Template
 
-func banUser (res http.ResponseWriter, req *http.Request){
-	//Grabs clients IP address
-	ip,_,_ := net.SplitHostPort(req.RemoteAddr)
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*"))
+	dbUsers["EthanBB13@gmail.com"] = user{"EthanBB13@gmail.com", "eth787878", "Ethan", "Garnier"}
+}
 
-	for i := range bannedIp{
-		if i == ip {
-			log.Printf("%s has been banned from the web server", ip)
-			log.Fatal()
-
+func login(w http.ResponseWriter, req *http.Request)  {
+	if req.Method == http.MethodPost{
+		un := req.FormValue("username")
+		p := req.FormValue("password")
+		//Does this user exist?? Using comma ok idiom
+		u, ok := dbUsers[un]
+		if !ok{
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
 		}
+		//does the username/password combo match at all??
+		if u.Pass != p{
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+		//Create a session
+		sID := uuid.NewV4()
+		c := &http.Cookie{
+			Name: "session",
+			Value: sID.String(),
+			HttpOnly: true,
+		}
+		http.SetCookie(w, c)
+		dbSessions[c.Value] = un
+		http.Redirect(w, req, "/", http.StatusSeeOther)
+		return
 	}
 
+	tpl.ExecuteTemplate(w, "login.gohtml", nil)
+}
 
-}*/
+
 
 func homeHandler(tpl *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -180,11 +212,18 @@ func homeHandler(tpl *template.Template) http.Handler {
 
 func main() {
 	flag.Parse()
-	tpl := template.Must(template.ParseFiles("home.html"))
+	tpl := template.Must(template.ParseFiles("templates/chat.html"))
 	h := newHub()
 	router := http.NewServeMux()
-	router.Handle("/", homeHandler(tpl))
+	//router.HandleFunc("/", home)
+	router.HandleFunc("/login", login)
+	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", wsHandler{h: h} )
 	log.Println("serving on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
+
+//TODO: Here is a comment, current build is not user friendly!!
+//TODO: Build a home function where users can be redirected to and from login, signup and the chat
+//TODO: Add redirecting links to gohtml files
+//TODO: Make chat.html into "gohtml"
