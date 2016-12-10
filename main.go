@@ -168,7 +168,7 @@ var tpl *template.Template
 
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
-	dbUsers["EthanBB13@gmail.com"] = user{"EthanBB13@gmail.com", "eth787878", "Ethan", "Garnier"}
+	dbUsers["Test"] = user{"Test", "eth787878", "Ethan", "Garnier"}
 }
 
 func login(w http.ResponseWriter, req *http.Request)  {
@@ -195,7 +195,7 @@ func login(w http.ResponseWriter, req *http.Request)  {
 		}
 		http.SetCookie(w, c)
 		dbSessions[c.Value] = un
-		http.Redirect(w, req, "/", http.StatusSeeOther)
+		http.Redirect(w, req, "/chat", http.StatusSeeOther)
 		return
 	}
 
@@ -215,8 +215,8 @@ func main() {
 	tpl := template.Must(template.ParseFiles("templates/chat.html"))
 	h := newHub()
 	router := http.NewServeMux()
-	//router.HandleFunc("/", home)
-	router.HandleFunc("/login", login)
+	//router.HandleFunc("/signup", singup)
+	router.HandleFunc("/", login)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", wsHandler{h: h} )
 	log.Println("serving on port 8080")
