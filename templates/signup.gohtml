@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>ok idiom</title>
+</head>
+<body>
+<form method="post">
+   <input type="text" name="firstname" placeholder="first name"><br>
+   <input type="text" name="lastname" placeholder="last name"><br>
+   <label for="li">Logged In</label>
+   <input type="checkbox" id="li" name="loggedin"><br>
+   <input type="submit">
+
+</form>
+
+{{if .First}}
+FIRST:{{.First}}<br>
+LAST:{{.Last}}<br>
+LOGGED IN:{{.Loggedin}}<br>
+{{end}}
+</body>
+</html>

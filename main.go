@@ -171,6 +171,13 @@ func init() {
 	dbUsers["Test"] = user{"Test", "eth787878", "Ethan", "Garnier"}
 }
 
+func signup(w http.ResponseWriter, req *http.Request)  {
+
+
+
+	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
+}
+
 func login(w http.ResponseWriter, req *http.Request)  {
 	if req.Method == http.MethodPost{
 		un := req.FormValue("username")
@@ -215,7 +222,7 @@ func main() {
 	tpl := template.Must(template.ParseFiles("templates/chat.html"))
 	h := newHub()
 	router := http.NewServeMux()
-	//router.HandleFunc("/signup", singup)
+	router.HandleFunc("/signup", signup)
 	router.HandleFunc("/", login)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", wsHandler{h: h} )
