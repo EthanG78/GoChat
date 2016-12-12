@@ -24,8 +24,8 @@ _With more to come_
 **Special thanks to**
 @ToddMcleod for teaching me the fundamentals of golang web programming.</br>
 https://github.com/GoesToEleven</br>
-&
-@Aaron Schlesinger for inspiring me to work with Gorilla Mux and the websocket tools.
+&</br>
+@Aaron Schlesinger for inspiring me to work with Gorilla Mux and the websocket tools.</br>
 https://github.com/arschles
 
 **Coded by Ethan Garnier**
