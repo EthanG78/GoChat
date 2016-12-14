@@ -167,7 +167,7 @@ func init() {
 }
 
 //TODO: Finish this stupid function
-func signup(w http.ResponseWriter, req *http.Request) {
+func sign_up(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
 		sID := uuid.NewV4()
@@ -187,6 +187,9 @@ func signup(w http.ResponseWriter, req *http.Request) {
 		u = user{un, p}
 
 		dbUsers[c.Value] = u
+		//TODO: THIS NEXT COUPLE LINES OF CODE IS FOR TESTING THIS FUNCTION...
+		log.Println(dbUsers)
+		return
 	}
 
 	//Executes Template
@@ -235,7 +238,7 @@ func main() {
 	tpl := template.Must(template.ParseFiles("templates/chat.html"))
 	h := newHub()
 	router := http.NewServeMux()
-	router.HandleFunc("/signup", signup)
+	router.HandleFunc("/signup", sign_up)
 	router.HandleFunc("/", login)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", wsHandler{h: h})
