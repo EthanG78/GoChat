@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"log"
-	"net/http"
-	"text/template"
-	"sync"
-	"time"
 	"net"
+	"net/http"
+	"sync"
+	"text/template"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/satori/go.uuid"
@@ -113,20 +113,18 @@ type wsHandler struct {
 
 func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-
-
 	//BAN USERS HERE!
 	//Update ip's with syntax "HOST:PORT"
 	var bannedIp []string
 	bannedIp = append(bannedIp, "")
 	/////////////
 	//Finds user IP
-	ip,_,_ := net.SplitHostPort(r.RemoteAddr)
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
 	log.Printf("%s has connected.", ip)
 
 	//Checks to see if user IP matches slice of banned IP's
-	for i := range bannedIp{
-		if bannedIp[i] == ip{
+	for i := range bannedIp {
+		if bannedIp[i] == ip {
 			log.Printf("%s has been banned from the web server", ip)
 			http.Error(w, "BANNED", http.StatusUnauthorized)
 			return
@@ -150,15 +148,13 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	wsConn.Close()
 }
 
-
 //////////////////////
 //MAIN
 /////////////////////
 
 type user struct {
 	UserName string
-	Pass string
-
+	Pass     string
 }
 
 var dbUsers = map[string]user{}
@@ -170,14 +166,13 @@ func init() {
 	dbUsers["Test"] = user{"Test", "eth787878"}
 }
 
-
 //TODO: Finish this stupid function
-func signup(w http.ResponseWriter, req *http.Request)  {
+func signup(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
-	if err != nil{
+	if err != nil {
 		sID := uuid.NewV4()
 		c = &http.Cookie{
-			Name: "session",
+			Name:  "session",
 			Value: sID.String(),
 		}
 		http.SetCookie(w, c)
@@ -185,7 +180,7 @@ func signup(w http.ResponseWriter, req *http.Request)  {
 
 	//Check form submission
 	var u user
-	if req.Method == http.MethodPost{
+	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
 
@@ -198,26 +193,26 @@ func signup(w http.ResponseWriter, req *http.Request)  {
 	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
 }
 
-func login(w http.ResponseWriter, req *http.Request)  {
-	if req.Method == http.MethodPost{
+func login(w http.ResponseWriter, req *http.Request) {
+	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
 		//Does this user exist?? Using comma ok idiom
 		u, ok := dbUsers[un]
-		if !ok{
+		if !ok {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 		//does the username/password combo match at all??
-		if u.Pass != p{
+		if u.Pass != p {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 		//Create a session
 		sID := uuid.NewV4()
 		c := &http.Cookie{
-			Name: "session",
-			Value: sID.String(),
+			Name:     "session",
+			Value:    sID.String(),
 			HttpOnly: true,
 		}
 		http.SetCookie(w, c)
@@ -228,8 +223,6 @@ func login(w http.ResponseWriter, req *http.Request)  {
 
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
 }
-
-
 
 func homeHandler(tpl *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -245,7 +238,7 @@ func main() {
 	router.HandleFunc("/signup", signup)
 	router.HandleFunc("/", login)
 	router.Handle("/chat", homeHandler(tpl))
-	router.Handle("/ws", wsHandler{h: h} )
+	router.Handle("/ws", wsHandler{h: h})
 	log.Println("serving on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -20,7 +20,7 @@ Upon completion I will host this app on google's AppEngine for public use.</br>
 `UUID/HMAC SHA256 encrytion`</br>
 `GOHTML webpage integration`</br>
 _With more to come_
-
+ 
 **Special thanks to**
 @ToddMcleod for teaching me the fundamentals of golang web programming.</br>
 https://github.com/GoesToEleven</br>
