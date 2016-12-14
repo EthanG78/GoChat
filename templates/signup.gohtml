@@ -5,16 +5,13 @@
    <title>Chat Sign-Up</title>
 </head>
 <body>
-<form method="post">
-   <input type="text" name="username" placeholder="email"><br>
-   <input type="text" name="password" placeholder="password"><br>
-   <input type="submit">
 
-</form>
+   <h1>SIGN-UP</h1>
+   <form method="post">
+      <input type="text" name="username" placeholder="email">
+      <input type="text" name="password" placeholder="password">
+      <input type="submit">
+   </form>
 
-{{if .First}}
-Username: {{.Username}}<br>
-Password: {{.Pass}}<br>
-{{end}}
 </body>
 </html>
