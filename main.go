@@ -158,8 +158,7 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type user struct {
 	UserName string
 	Pass string
-	First string
-	Last string
+
 }
 
 var dbUsers = map[string]user{}
@@ -168,9 +167,11 @@ var tpl *template.Template
 
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
-	dbUsers["Test"] = user{"Test", "eth787878", "Ethan", "Garnier"}
+	dbUsers["Test"] = user{"Test", "eth787878"}
 }
 
+
+//TODO: Finish this stupid function
 func signup(w http.ResponseWriter, req *http.Request)  {
 	c, err := req.Cookie("session")
 	if err != nil{
@@ -186,7 +187,7 @@ func signup(w http.ResponseWriter, req *http.Request)  {
 	var u user
 	if req.Method == http.MethodPost{
 		un := req.FormValue("username")
-		p := req.FormValue("Password")
+		p := req.FormValue("password")
 
 		u = user{un, p}
 
