@@ -187,7 +187,9 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 		u = user{un, p}
 
 		dbUsers[c.Value] = u
+		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		//TODO: THIS NEXT COUPLE LINES OF CODE IS FOR TESTING THIS FUNCTION...
+		//IT IS THE COOKIE THAT IS REQUIRED IN LOGIN!!!! OR THE NAME IN DBusers!
 		log.Println(dbUsers)
 		return
 	}
@@ -204,11 +206,13 @@ func login(w http.ResponseWriter, req *http.Request) {
 		u, ok := dbUsers[un]
 		if !ok {
 			http.Error(w, "Forbidden", http.StatusForbidden)
+			//http.Redirect(w, req, "/login", http.StatusForbidden)
 			return
 		}
 		//does the username/password combo match at all??
 		if u.Pass != p {
 			http.Error(w, "Forbidden", http.StatusForbidden)
+			//http.Redirect(w, req, "/login", http.StatusForbidden)
 			return
 		}
 		//Create a session
@@ -238,15 +242,16 @@ func main() {
 	tpl := template.Must(template.ParseFiles("templates/chat.html"))
 	h := newHub()
 	router := http.NewServeMux()
-	router.HandleFunc("/signup", sign_up)
-	router.HandleFunc("/", login)
+	router.HandleFunc("/", sign_up)
+	router.HandleFunc("/login", login)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", wsHandler{h: h})
 	log.Println("serving on port 8080")
+	log.Println(dbUsers)
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 //TODO: Here is a comment, current build is not user friendly!!
 //TODO: Build a home function where users can be redirected to and from login, signup and the chat
-//TODO: Add redirecting links to gohtml files
-//TODO: Make chat.html into "gohtml"
+//TODO: Add redirecting links to go html files
+//TODO: Make chat.html into "go html"
