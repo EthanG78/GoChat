@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"text/template"
-
+	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
 )
 
@@ -104,12 +104,12 @@ func login(w http.ResponseWriter, req *http.Request) {
 func main() {
 	flag.Parse()
 	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
-	h := newHub()
+	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.HandleFunc("/", sign_up)
 	router.HandleFunc("/login", login)
 	router.Handle("/chat", homeHandler(tpl))
-	router.Handle("/ws", wsHandler{h: h})
+	router.Handle("/ws", lib.WsHandler{H:H})
 	log.Println("serving on port 8080")
 	log.Println("Users:", dbUsers)
 	//log.Println("Sessions: ", dbSessions)
