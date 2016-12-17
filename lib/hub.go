@@ -9,7 +9,7 @@ import (
 //////////////////////
 //HUB
 /////////////////////
-type hub struct {
+type Hub struct {
 	// the mutex to protect connections
 	connectionsMx sync.RWMutex
 
@@ -23,8 +23,8 @@ type hub struct {
 	log   [][]byte
 }
 
-func newHub() *hub {
-	h := &hub{
+func NewHub() *Hub {
+	h := &Hub{
 		connectionsMx: sync.RWMutex{},
 		broadcast:     make(chan []byte),
 		connections:   make(map[*connection]struct{}),
@@ -50,13 +50,13 @@ func newHub() *hub {
 	return h
 }
 
-func (h *hub) addConnection(conn *connection) {
+func (h *Hub) addConnection(conn *connection) {
 	h.connectionsMx.Lock()
 	defer h.connectionsMx.Unlock()
 	h.connections[conn] = struct{}{}
 }
 
-func (h *hub) removeConnection(conn *connection) {
+func (h *Hub) removeConnection(conn *connection) {
 	h.connectionsMx.Lock()
 	defer h.connectionsMx.Unlock()
 	if _, ok := h.connections[conn]; ok {
