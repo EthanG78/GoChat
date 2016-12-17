@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"log"
-	"net"
+	//"net"
 	"net/http"
 	"sync"
 	"text/template"
@@ -113,7 +113,7 @@ type wsHandler struct {
 
 func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	//BAN USERS HERE!
+	/*//BAN USERS HERE!
 	//Update ip's with syntax "HOST:PORT"
 	var bannedIp []string
 	bannedIp = append(bannedIp, "")
@@ -130,7 +130,7 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	//////////
+	*/
 
 	wsConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
