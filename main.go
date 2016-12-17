@@ -184,12 +184,13 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
 
+		c.Value = un
 		u = user{un, p}
 
 		dbUsers[c.Value] = u
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		//TODO: THIS NEXT COUPLE LINES OF CODE IS FOR TESTING THIS FUNCTION...
-		//IT IS THE COOKIE THAT IS REQUIRED IN LOGIN!!!! OR THE NAME IN DBusers!
+		//IT IS THE COOKIE THAT IS REQUIRED IN LOGIN!!!! OR THE NAME IN DB users!
 		log.Println(dbUsers)
 		return
 	}
@@ -203,7 +204,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
 		//Does this user exist?? Using comma ok idiom
-		u, ok := dbUsers[un]
+		u, ok:= dbUsers[un]
 		if !ok {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			//http.Redirect(w, req, "/login", http.StatusForbidden)
@@ -239,7 +240,7 @@ func homeHandler(tpl *template.Template) http.Handler {
 
 func main() {
 	flag.Parse()
-	tpl := template.Must(template.ParseFiles("templates/chat.html"))
+	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
 	h := newHub()
 	router := http.NewServeMux()
 	router.HandleFunc("/", sign_up)
@@ -247,7 +248,8 @@ func main() {
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", wsHandler{h: h})
 	log.Println("serving on port 8080")
-	log.Println(dbUsers)
+	log.Println("Users:", dbUsers)
+	log.Println("Sessions: ", dbSessions)
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
