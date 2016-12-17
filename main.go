@@ -166,6 +166,13 @@ func init() {
 	dbUsers["Test"] = user{"Test", "eth787878"}
 }
 
+func homeHandler(tpl *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tpl.Execute(w, r)
+	})
+}
+
+
 func sign_up(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
@@ -230,11 +237,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
 }
 
-func homeHandler(tpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tpl.Execute(w, r)
-	})
-}
+
 
 func main() {
 	flag.Parse()
@@ -247,7 +250,7 @@ func main() {
 	router.Handle("/ws", wsHandler{h: h})
 	log.Println("serving on port 8080")
 	log.Println("Users:", dbUsers)
-	log.Println("Sessions: ", dbSessions)
+	//log.Println("Sessions: ", dbSessions)
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
