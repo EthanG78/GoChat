@@ -166,7 +166,6 @@ func init() {
 	dbUsers["Test"] = user{"Test", "eth787878"}
 }
 
-//TODO: Finish this stupid function
 func sign_up(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
@@ -189,8 +188,7 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 
 		dbUsers[c.Value] = u
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
-		//TODO: THIS NEXT COUPLE LINES OF CODE IS FOR TESTING THIS FUNCTION...
-		//IT IS THE COOKIE THAT IS REQUIRED IN LOGIN!!!! OR THE NAME IN DB users!
+
 		log.Println(dbUsers)
 		return
 	}
