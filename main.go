@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"text/template"
+	"time"
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
 )
@@ -51,6 +52,20 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
+
+
+		//Checking to see if user filled out required fields.
+		if un == ""{
+			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
+			time.Sleep(300 * time.Millisecond)
+			http.Redirect(w, req, "/", http.StatusSeeOther)
+			return
+		}else if p == "" {
+			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
+			time.Sleep(300 * time.Millisecond)
+			http.Redirect(w, req, "/", http.StatusSeeOther)
+			return
+		}
 
 		c.Value = un
 		u = user{un, p}
