@@ -57,12 +57,13 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 		//Checking to see if user filled out required fields.
 		if un == ""{
 			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
-			time.Sleep(300 * time.Millisecond)
+			time.Sleep(3000 * time.Millisecond)
 			http.Redirect(w, req, "/", http.StatusSeeOther)
 			return
+
 		}else if p == "" {
 			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
-			time.Sleep(300 * time.Millisecond)
+			time.Sleep(3000 * time.Millisecond)
 			http.Redirect(w, req, "/", http.StatusSeeOther)
 			return
 		}
@@ -85,6 +86,19 @@ func login(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
+
+		if un == ""{
+			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
+			time.Sleep(3000 * time.Millisecond)
+			http.Redirect(w, req, "/login", http.StatusSeeOther)
+			return
+
+		}else if p == ""{
+			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
+			time.Sleep(3000 * time.Millisecond)
+			http.Redirect(w, req, "/login", http.StatusSeeOther)
+			return
+		}
 		//Does this user exist?? Using comma ok idiom
 		u, ok:= dbUsers[un]
 		if !ok {
