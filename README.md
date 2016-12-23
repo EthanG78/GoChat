@@ -12,7 +12,7 @@ Once in the directory, simply `go run main.go` this will start a local instance 
 **What is to come?**
 Upon completion I will host this app on google's AppEngine for public use.</br>
 
-**Currently Integrated functions**
+**Currently Integrated functions**</br>
 `Login`</br>
 `User Database`</br>
 `Chat functionality`</br>
