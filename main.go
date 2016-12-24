@@ -58,13 +58,13 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 		if un == ""{
 			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
 			time.Sleep(3000 * time.Millisecond)
-			http.Redirect(w, req, "/", http.StatusSeeOther)
+			//http.Redirect(w, req, "/", http.StatusSeeOther)
 			return
 
 		}else if p == "" {
 			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
 			time.Sleep(3000 * time.Millisecond)
-			http.Redirect(w, req, "/", http.StatusSeeOther)
+			//http.Redirect(w, req, "/", http.StatusSeeOther)
 			return
 		}
 
@@ -90,13 +90,13 @@ func login(w http.ResponseWriter, req *http.Request) {
 		if un == ""{
 			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
 			time.Sleep(3000 * time.Millisecond)
-			http.Redirect(w, req, "/login", http.StatusSeeOther)
+			//http.Redirect(w, req, "/login", http.StatusSeeOther)
 			return
 
 		}else if p == ""{
 			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
 			time.Sleep(3000 * time.Millisecond)
-			http.Redirect(w, req, "/login", http.StatusSeeOther)
+			//http.Redirect(w, req, "/login", http.StatusSeeOther)
 			return
 		}
 		//Does this user exist?? Using comma ok idiom
