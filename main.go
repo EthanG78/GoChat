@@ -5,9 +5,10 @@ import (
 	"log"
 	"net/http"
 	"text/template"
-	"time"
+
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
+
 )
 
 
@@ -35,6 +36,15 @@ func homeHandler(tpl *template.Template) http.Handler {
 	})
 }
 
+func forbidden(w http.ResponseWriter, req *http.Request)  {
+
+	/*
+	http.Error(w, "Please fill out the required fields, you will be redirected shortly", http.StatusForbidden)
+	*/
+	tpl.ExecuteTemplate(w, "forbidden.gohtml", nil)
+}
+
+
 
 func sign_up(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
@@ -56,15 +66,11 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 
 		//Checking to see if user filled out required fields.
 		if un == ""{
-			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
-			time.Sleep(3000 * time.Millisecond)
-			//http.Redirect(w, req, "/", http.StatusSeeOther)
+			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 
 		}else if p == "" {
-			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
-			time.Sleep(3000 * time.Millisecond)
-			//http.Redirect(w, req, "/", http.StatusSeeOther)
+			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 
@@ -88,15 +94,11 @@ func login(w http.ResponseWriter, req *http.Request) {
 		p := req.FormValue("password")
 
 		if un == ""{
-			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
-			time.Sleep(3000 * time.Millisecond)
-			//http.Redirect(w, req, "/login", http.StatusSeeOther)
+			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 
 		}else if p == ""{
-			http.Error(w, "Please fill out required fields, you will be redirected shortly.", http.StatusForbidden)
-			time.Sleep(3000 * time.Millisecond)
-			//http.Redirect(w, req, "/login", http.StatusSeeOther)
+			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 		//Does this user exist?? Using comma ok idiom
@@ -137,6 +139,7 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/", sign_up)
 	router.HandleFunc("/login", login)
+	router.HandleFunc("/forbidden", forbidden)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", lib.WsHandler{H:H})
 	log.Println("serving on port 8080")
