@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"text/template"
-
+	"golang.org/x/crypto/bcrypt"
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
 
@@ -73,9 +73,16 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
+		//Must declare password as a byte after error checking
+		pss := []byte(p)
+		password, err := bcrypt.GenerateFromPassword(pss,0)
+		if err != nil{
+			log.Fatalf("Error logging password for %s", un)
+		}
 
+		pass := string(password[:])
 		c.Value = un
-		u = user{un, p}
+		u = user{un, pass}
 
 		dbUsers[c.Value] = u
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
