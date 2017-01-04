@@ -121,11 +121,22 @@ func login(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		//does the username/password combo match at all??
-		if u.Pass != p {
+		//Compares bcrypt hash to user input!
+		pass := []byte(p)
+		userPass := []byte(u.Pass)
+		password := bcrypt.CompareHashAndPassword(userPass, pass)
+		if password != nil{
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
+
+		/*if u.Pass != p {
+			time.Sleep(3000)
+			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
+			return
+		}*/
+
 		//Create a session
 		sID := uuid.NewV4()
 		c := &http.Cookie{
