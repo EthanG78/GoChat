@@ -28,6 +28,6 @@ https://github.com/GoesToEleven</br>
 @Aaron Schlesinger for inspiring me to work with Gorilla Mux and the websocket tools.</br>
 https://github.com/arschles
 
-![GitHub Logo](/styling/logo/alpha-logo.png)
+![Logo](http://i.imgur.com/DTCZ23Y.png)
 
 **Coded by Ethan Garnier**
