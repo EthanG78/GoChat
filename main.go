@@ -9,6 +9,7 @@ import (
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
 
+	"time"
 )
 
 
@@ -66,10 +67,12 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 
 		//Checking to see if user filled out required fields.
 		if un == ""{
+			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 
 		}else if p == "" {
+			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
@@ -101,24 +104,26 @@ func login(w http.ResponseWriter, req *http.Request) {
 		p := req.FormValue("password")
 
 		if un == ""{
+			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 
 		}else if p == ""{
+			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 		//Does this user exist?? Using comma ok idiom
 		u, ok:= dbUsers[un]
 		if !ok {
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			//http.Redirect(w, req, "/login", http.StatusForbidden)
+			time.Sleep(3000)
+			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 		//does the username/password combo match at all??
 		if u.Pass != p {
-			http.Error(w, "Forbidden", http.StatusForbidden)
-			//http.Redirect(w, req, "/login", http.StatusForbidden)
+			time.Sleep(3000)
+			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 		//Create a session
