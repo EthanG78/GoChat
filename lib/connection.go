@@ -5,6 +5,7 @@ import (
 	"sync"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"net"
 )
 
 //////////////////////
@@ -48,24 +49,10 @@ type WsHandler struct {
 
 func (wsh WsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	/*//BAN USERS HERE!
-	//Update ip's with syntax "HOST:PORT"
-	var bannedIp []string
-	bannedIp = append(bannedIp, "")
-	/////////////
-	//Finds user IP
-	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	log.Printf("%s has connected.", ip)
+	//Find users IP and display them
+	ip,_,_ := net.SplitHostPort(r.RemoteAddr)
+	log.Printf("%s has connected", ip)
 
-	//Checks to see if user IP matches slice of banned IP's
-	for i := range bannedIp {
-		if bannedIp[i] == ip {
-			log.Printf("%s has been banned from the web server", ip)
-			http.Error(w, "BANNED", http.StatusUnauthorized)
-			return
-		}
-	}
-	*/
 
 	wsConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {

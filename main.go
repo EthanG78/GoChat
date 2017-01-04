@@ -145,6 +145,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 
 
 func main() {
+
 	flag.Parse()
 	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
 	H := lib.NewHub()
