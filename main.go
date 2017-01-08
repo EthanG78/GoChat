@@ -101,14 +101,14 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 func login(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
-		p := req.FormValue("password")
+		inputPass := req.FormValue("password")
 
 		if un == ""{
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 
-		}else if p == ""{
+		}else if inputPass == ""{
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
@@ -122,20 +122,19 @@ func login(w http.ResponseWriter, req *http.Request) {
 		}
 		//does the username/password combo match at all??
 		//Compares bcrypt hash to user input!
-		pass := []byte(p)
-		userPass := []byte(u.Pass)
-		password := bcrypt.CompareHashAndPassword(userPass, pass)
-		if password != nil{
+		pass := []byte(inputPass)
+		password, err := bcrypt.GenerateFromPassword(pass,0)
+		if err != nil{
+			log.Fatalf("Error loggin in %s", un)
+		}
+		outputPass := string(password[:])
+		if outputPass != u.Pass{
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 
-		/*if u.Pass != p {
-			time.Sleep(3000)
-			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
-			return
-		}*/
+
 
 		//Create a session
 		sID := uuid.NewV4()
