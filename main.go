@@ -122,6 +122,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		}
 		//does the username/password combo match at all??
 		//Compares bcrypt hash to user input!
+
 		password := []byte(pass)
 		hash := []byte(u.Pass)
 		err := bcrypt.CompareHashAndPassword(hash, password)
@@ -149,6 +150,9 @@ func login(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
 }
 
+func faviconHandler(w http.ResponseWriter, r *http.Request){
+	http.ServeFile(w, r, "styling/logo/favicon.ico")
+}
 
 
 func main() {
@@ -157,6 +161,7 @@ func main() {
 	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
 	H := lib.NewHub()
 	router := http.NewServeMux()
+	router.HandleFunc("/favicon.ico", faviconHandler)
 	router.HandleFunc("/", sign_up)
 	router.HandleFunc("/login", login)
 	router.HandleFunc("/forbidden", forbidden)
@@ -171,4 +176,4 @@ func main() {
 //TODO: Here is a comment, current build is not user friendly!!
 //TODO: Build a home function where users can be redirected to and from login, signup and the chat
 //TODO: Add redirecting links to go html files
-//TODO: Make chat.html into "go html"
+
