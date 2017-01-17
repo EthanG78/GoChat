@@ -8,13 +8,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
-	"math/rand"
+
 	"time"
-	"io"
-	"image/color"
-	"image/gif"
-	"image"
-	"math"
+
+
 )
 
 
@@ -163,6 +160,7 @@ func faviconHandler(w http.ResponseWriter, r *http.Request){
 }
 
 //SECRET ANIMATED GIF
+/*
 var palette = []color.Color{color.White, color.Black}
 
 const(
@@ -198,9 +196,10 @@ func lassajous(out io.Writer)  {
 	gif.EncodeAll(out, &anim) // ignoring encoding errors.
 
 }
+*/
 
 func lassajousHandler (w http.ResponseWriter, r *http.Request){
-	lassajous(w)
+	lib.Lassajous(w)
 }
 func main() {
 
