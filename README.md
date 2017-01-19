@@ -6,21 +6,23 @@ Whilst using the amazingly crafted _Gorilla Mux_ library.</br>
 
 **Installing**
 First you must have `Golang v1.2` or later installed on your system with a working workspace.</br>
-Next you must `go get github.com/EthanG78/golang_chat`.</br>
-This will locate the source files into your Go workspace</br>
+Next open a command promt and type `go get github.com/EthanG78/golang_chat`.</br>
+This will download the source files into your Go workspace</br>
 Next simply use the command line and `CD` into the golang_chat directory.</br>
 Once in the directory, simply `go run main.go` this will start a local instance of the server at the address `localhost:8080`.</br>
 
 **What is to come?**
+For months now I have been releasing several alpha versions, the end of January will mark the first Beta release!</br>
 Upon completion I will host this app on google's AppEngine for public use.</br>
 
 **Currently Integrated functions**</br>
-`Login`</br>
+`Login and sign-up`</br>
 `User Database`</br>
 `Chat functionality`</br>
 `Websocket routing`</br>
-`UUID/HMAC SHA256 encrytion`</br>
+`Bcrypt encryption`</br>
 `GOHTML webpage integration`</br>
+`Client-Side RSA`</br>
 _With more to come_
  
 **Special thanks to**

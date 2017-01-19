@@ -8,10 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
-
 	"time"
-
-
 )
 
 
@@ -19,6 +16,7 @@ import (
 //MAIN
 /////////////////////
 
+//Create a user
 type user struct {
 	UserName string
 	Pass     string
@@ -26,11 +24,12 @@ type user struct {
 
 
 
-
+//Establish variables
 var dbUsers = map[string]user{}
 var dbSessions = map[string]string{}
 var tpl *template.Template
 
+//Initialize template reader
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
 	dbUsers["Test"] = user{"Test", "eth787878"}
@@ -42,16 +41,13 @@ func homeHandler(tpl *template.Template) http.Handler {
 	})
 }
 
+//Redirects to error page
 func forbidden(w http.ResponseWriter, req *http.Request)  {
-
-	/*
-	http.Error(w, "Please fill out the required fields, you will be redirected shortly", http.StatusForbidden)
-	*/
 	tpl.ExecuteTemplate(w, "forbidden.gohtml", nil)
 }
 
 
-
+//Sign up function
 func sign_up(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
@@ -103,6 +99,8 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
 }
 
+
+//Login function
 func login(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
@@ -155,52 +153,17 @@ func login(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
 }
 
+//Handles site favicon
 func faviconHandler(w http.ResponseWriter, r *http.Request){
 	http.ServeFile(w, r, "styling/logo/favicon.ico")
 }
 
-//SECRET ANIMATED GIF
-/*
-var palette = []color.Color{color.White, color.Black}
-
-const(
-	whiteIndex = 0 //first color in palette
-	blackIndex = 1 //next color in palette
-)
-
-func lassajous(out io.Writer)  {
-	const(
-		cycles = 5 //number of complex x oscillator revolutions
-		res = 0.001 // angular resolution
-		size = 100 //image canvas covers [-size..+size]
-		nframes = 64 //number of animation frames
-		delay = 8 // delay between frames in 10ms units
-
-	)
-
-	freq := rand.Float64()* 3.0
-	anim := gif.GIF{LoopCount: nframes}
-	phase := 0.0
-	for i := 0; i < nframes; i++ {
-		rect := image.Rect(0,0,2*size+1,2*size+1)
-		img := image.NewPaletted(rect, palette)
-		for t := 0.0; t < cycles*2*math.Pi; t += res{
-			x := math.Sin(t)
-			y := math.Sin(t*freq + phase)
-			img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5), blackIndex)
-		}
-		phase += 0.1
-		anim.Delay = append(anim.Delay, delay)
-		anim.Image = append(anim.Image, img)
-	}
-	gif.EncodeAll(out, &anim) // ignoring encoding errors.
-
-}
-*/
-
+//Handles lassajous animated gif
 func lassajousHandler (w http.ResponseWriter, r *http.Request){
 	lib.Lassajous(w)
 }
+
+//MAIN
 func main() {
 
 	flag.Parse()
