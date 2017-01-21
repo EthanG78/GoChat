@@ -8,6 +8,7 @@
 
    <h1>SIGN-UP</h1>
    <form method="post">
+      <input type="hidden" name="token" value="{{.}}">
       <input type="text" name="username" placeholder="username">
       <input type="text" name="password" placeholder="password">
       <input type="submit">

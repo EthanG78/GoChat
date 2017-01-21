@@ -1,16 +1,20 @@
 package main
 
 import (
+	"crypto/md5"
 	"flag"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
-	"golang.org/x/crypto/bcrypt"
+	"time"
+
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
-	"time"
+	"golang.org/x/crypto/bcrypt"
 )
-
 
 //////////////////////
 //MAIN
@@ -21,8 +25,6 @@ type user struct {
 	UserName string
 	Pass     string
 }
-
-
 
 //Establish variables
 var dbUsers = map[string]user{}
@@ -42,13 +44,12 @@ func homeHandler(tpl *template.Template) http.Handler {
 }
 
 //Redirects to error page
-func forbidden(w http.ResponseWriter, req *http.Request)  {
+func forbidden(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "forbidden.gohtml", nil)
 }
 
-
 //Sign up function
-func sign_up(w http.ResponseWriter, req *http.Request) {
+func signUp(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
 		sID := uuid.NewV4()
@@ -65,22 +66,21 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
 
-
 		//Checking to see if user filled out required fields.
-		if un == ""{
+		if un == "" {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 
-		}else if p == "" {
+		} else if p == "" {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 		//Must declare password as a byte after error checking
 		pss := []byte(p)
-		password, err := bcrypt.GenerateFromPassword(pss,0)
-		if err != nil{
+		password, err := bcrypt.GenerateFromPassword(pss, 0)
+		if err != nil {
 			log.Fatalf("Error logging password for %s", un)
 		}
 
@@ -92,13 +92,12 @@ func sign_up(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 
 		log.Println(dbUsers)
+
 		return
 	}
 
-	//Executes Template
 	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
 }
-
 
 //Login function
 func login(w http.ResponseWriter, req *http.Request) {
@@ -106,18 +105,18 @@ func login(w http.ResponseWriter, req *http.Request) {
 		un := req.FormValue("username")
 		pass := req.FormValue("password")
 
-		if un == ""{
+		if un == "" {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 
-		}else if pass == ""{
+		} else if pass == "" {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
 		//Does this user exist?? Using comma ok idiom
-		u, ok:= dbUsers[un]
+		u, ok := dbUsers[un]
 		if !ok {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
@@ -129,13 +128,11 @@ func login(w http.ResponseWriter, req *http.Request) {
 		password := []byte(pass)
 		hash := []byte(u.Pass)
 		err := bcrypt.CompareHashAndPassword(hash, password)
-		if err != nil{
+		if err != nil {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
-
-
 
 		//Create a session
 		sID := uuid.NewV4()
@@ -144,39 +141,60 @@ func login(w http.ResponseWriter, req *http.Request) {
 			Value:    sID.String(),
 			HttpOnly: true,
 		}
+
 		http.SetCookie(w, c)
 		dbSessions[c.Value] = un
-		http.Redirect(w, req, "/chat", http.StatusSeeOther)
+
+		//Genertaing random token for validations
+		h := md5.New()
+		crutime := int64(-42)
+		io.WriteString(h, strconv.FormatInt(crutime, 10))
+		io.WriteString(h, "ganraomaxxxxxxxxx")
+		Token := fmt.Sprintf("%x", h.Sum(nil))
+
+		//Showing token for debugging
+		log.Println(Token)
+
+		req.ParseForm()
+		Token = req.Form.Get("token")
+		if Token != "" {
+			http.Redirect(w, req, "/chat", http.StatusSeeOther)
+		} else {
+			http.Error(w, "Error validating login token.", http.StatusForbidden)
+		}
 		return
 	}
 
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
+
 }
 
 //Handles site favicon
-func faviconHandler(w http.ResponseWriter, r *http.Request){
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "styling/logo/favicon.ico")
 }
 
 //Handles lassajous animated gif
-func lassajousHandler (w http.ResponseWriter, r *http.Request){
+func lassajousHandler(w http.ResponseWriter, r *http.Request) {
 	lib.Lassajous(w)
 }
 
 //MAIN
 func main() {
 
+	//Wrapping handlers
+
 	flag.Parse()
 	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
 	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.HandleFunc("/favicon.ico", faviconHandler)
-	router.HandleFunc("/", sign_up)
+	router.HandleFunc("/", signUp)
 	router.HandleFunc("/login", login)
 	router.HandleFunc("/forbidden", forbidden)
 	router.HandleFunc("/lassajous", lassajousHandler)
 	router.Handle("/chat", homeHandler(tpl))
-	router.Handle("/ws", lib.WsHandler{H:H})
+	router.Handle("/ws", lib.WsHandler{H: H})
 	log.Println("serving on port 8080")
 	log.Println("Users:", dbUsers)
 	//log.Println("Sessions: ", dbSessions)
@@ -186,4 +204,3 @@ func main() {
 //TODO: Here is a comment, current build is not user friendly!!
 //TODO: Build a home function where users can be redirected to and from login, signup and the chat
 //TODO: Add redirecting links to go html files
-
