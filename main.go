@@ -153,7 +153,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		Token := fmt.Sprintf("%x", h.Sum(nil))
 
 		//Showing token for debugging
-		log.Println(Token)
+		log.Println(un, ":", Token)
 
 		req.ParseForm()
 		Token = req.Form.Get("token")
