@@ -17,13 +17,40 @@
     #slogan{
         color: #d9d9d9;
     }   
+    #body{
+        text-align: center;
+        
+    }
+
+    .button{
+        background-color: #d9d9d9;
+        border-radius: 4px;
+        text-align: center;
+        border: 3px solid #d9d9d9; 
+        width: 20%;
+        overflow: hidden;
+        float: left;
+        margin-right: 5px;
+        
+    }
+
+    .link{
+        color: #3399ff;
+        text-decoration: none;
+    }
 
    </style>
 </head>
 <body>
     <div id="head" align="center">
         <img src="../styling/logo/gochat-logo.png" alt="Logo">
-        <h2 id="slogan">A chat written in Go, for Go</h2>
+        <h2 id="slogan">A chat written entirely in Go</h2>
+    </div>
+    <div id="body" align="center">
+        <a href="signup.gohtml" class="link"><div class="button">Sign-Up</div></a>
+        <a href="login.gohtml" class="link"><div class="button">Login</div></a>
+        <a href="chat.gohtml" class="link"><div class="button">Chat!</div></a>
+
     </div>
 
 </body>
