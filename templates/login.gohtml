@@ -3,8 +3,34 @@
 <head>
    <meta charset="utf-8">
    <title>Chat Login</title>
+   <style type="text/css">
+    /*Page styling*/
+        html{
+            background-color: #3399ff;
+            text-align: center;
+        }
+
+        #title{
+            color: #d9d9d9;
+        }
+
+        #return{
+             float: left;
+             background-color: #d9d9d9;
+             border-radius: 4px;
+             text-align: center;
+             border: 3px solid #d9d9d9; 
+             display: inline-block;
+         }
+
+         .link{
+            color: #3399ff;
+            text-decoration: none;
+         }
+   </style>
 </head>
 <body>
+
 {{if .UserName}}
 <h1>You are logged in</h1>
 USERNAME: {{.UserName}}<br>
@@ -12,7 +38,8 @@ PASSWORD: {{.Pass}}<br>
 
 
 {{else}}
-<h1>LOGIN</h1>
+<div id="return"><a href="/" class="link">Return Home</a></div></br>
+<h1 id="title">LOGIN</h1>
 <form method="post">
    <input type="hidden" name="token" value="{{.}}">
    <input type="text" name="username" placeholder="username">
