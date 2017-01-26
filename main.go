@@ -16,22 +16,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-//////////////////////
 //MAIN
-/////////////////////
 
+///////////////
 //Create a user
+///////////////
 type user struct {
 	UserName string
 	Pass     string
 }
 
+/////////////////////
 //Establish variables
+/////////////////////
 var dbUsers = map[string]user{}
 var dbSessions = map[string]string{}
 var tpl *template.Template
 
+////////////////////////////
 //Initialize template reader
+////////////////////////////
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
 	dbUsers["Test"] = user{"Test", "eth787878"}
@@ -43,12 +47,16 @@ func homeHandler(tpl *template.Template) http.Handler {
 	})
 }
 
+/////////////////////////
 //Redirects to error page
+/////////////////////////
 func forbidden(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "forbidden.gohtml", nil)
 }
 
+//////////////////
 //Sign up function
+//////////////////
 func signUp(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
@@ -99,7 +107,9 @@ func signUp(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
 }
 
+////////////////
 //Login function
+////////////////
 func login(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
@@ -169,17 +179,23 @@ func login(w http.ResponseWriter, req *http.Request) {
 
 }
 
+//////////////////////
 //Handles site favicon
+//////////////////////
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "styling/favicon.ico")
 }
 
+////////////////////////////////
 //Handles lassajous animated gif
+////////////////////////////////
 func lassajousHandler(w http.ResponseWriter, r *http.Request) {
 	lib.Lassajous(w)
 }
 
+///////////////////////
 //Handles the home page
+///////////////////////
 func home(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "home.gohtml", nil)
 }
@@ -192,7 +208,9 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//////
 //MAIN
+//////
 func main() {
 
 	//Wrapping handlers
@@ -216,6 +234,5 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-//TODO: Here is a comment, current build is not user friendly!!
-//TODO: Build a home function where users can be redirected to and from login, signup and the chat
-//TODO: Add redirecting links to go html files
+//TODO Current build is beta v1.0, it was released on 1/29/2017
+//This version is not suer friendly, this will change:)
