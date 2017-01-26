@@ -171,12 +171,25 @@ func login(w http.ResponseWriter, req *http.Request) {
 
 //Handles site favicon
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "styling/logo/favicon.ico")
+	http.ServeFile(w, r, "styling/favicon.ico")
 }
 
 //Handles lassajous animated gif
 func lassajousHandler(w http.ResponseWriter, r *http.Request) {
 	lib.Lassajous(w)
+}
+
+//Handles the home page
+func home(w http.ResponseWriter, r *http.Request) {
+	tpl.ExecuteTemplate(w, "home.gohtml", nil)
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/" {
+		home(w, r)
+	} else {
+		log.Printf("rootHandler: Could not forward request for %s any further.", r.RequestURI)
+	}
 }
 
 //MAIN
@@ -188,8 +201,10 @@ func main() {
 	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
 	H := lib.NewHub()
 	router := http.NewServeMux()
+	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
 	router.HandleFunc("/favicon.ico", faviconHandler)
-	router.HandleFunc("/", signUp)
+	router.HandleFunc("/", rootHandler)
+	router.HandleFunc("/signup", signUp)
 	router.HandleFunc("/login", login)
 	router.HandleFunc("/forbidden", forbidden)
 	router.HandleFunc("/lassajous", lassajousHandler)
