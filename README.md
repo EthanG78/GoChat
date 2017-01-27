@@ -1,14 +1,18 @@
+# GoChat
+
+An online text chat written entirely in Golang.</br>
+
 ![Logo](http://i.imgur.com/sxp65oJ.png)
 
-**What is it?**</br>
-This is an online chat written entirely in GO.</br>
-Whilst using the amazingly crafted _Gorilla Mux_ library.</br>
+**Downloading app**
+If you wish to run the web app from your machine without downloading the source simply</br>
+download the binary of the latest version.</br>
 
 **Installing**
 First you must have `Golang v1.2` or later installed on your system with a working workspace.</br>
-Next open a command promt and type `go get github.com/EthanG78/golang_chat`.</br>
+Download the directory through a terminal `go get github.com/EthanG78/GoChat`.</br>
 This will download the source files into your Go workspace</br>
-Next simply use the command line and `CD` into the golang_chat directory.</br>
+Next simply `CD` to the GoChat directory.</br>
 Once in the directory, simply `go run main.go` this will start a local instance of the server at the address `localhost:8080`.</br>
 
 **What is to come?**
@@ -22,7 +26,9 @@ Upon completion I will host this app on google's AppEngine for public use.</br>
 `Websocket routing`</br>
 `Bcrypt encryption`</br>
 `GOHTML webpage integration`</br>
+`Go themed styling`</br>
 `Client-Side RSA`</br>
+`CSRF protection`</br>
 _With more to come_
  
 **Special thanks to**
@@ -30,7 +36,7 @@ _With more to come_
 https://github.com/GoesToEleven</br>
 &</br>
 @Aaron Schlesinger for inspiring me to work with Gorilla Mux and the websocket tools.</br>
-https://github.com/arschles
+https://github.com/arschles</br>
 
 
 **Coded by Ethan Garnier**
