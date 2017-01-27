@@ -38,7 +38,8 @@ var tpl *template.Template
 ////////////////////////////
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
-	dbUsers["Test"] = user{"Test", "eth787878"}
+	//ADMIN USER: Admin:gochatadmin
+	dbUsers["Admin"] = user{"Admin", "$2a$10$5xymUNPSZfAm.XztfVCqUuC3MYLTPJ.dbXhGFsAJGaqyXoHteR8TO"}
 }
 
 func homeHandler(tpl *template.Template) http.Handler {
