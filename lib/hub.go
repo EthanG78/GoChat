@@ -6,9 +6,7 @@ import (
 	"sync"
 )
 
-//////////////////////
 //HUB
-/////////////////////
 type Hub struct {
 	// the mutex to protect connections
 	connectionsMx sync.RWMutex
@@ -23,6 +21,7 @@ type Hub struct {
 	log   [][]byte
 }
 
+//NewHub
 func NewHub() *Hub {
 	h := &Hub{
 		connectionsMx: sync.RWMutex{},

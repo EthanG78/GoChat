@@ -16,6 +16,7 @@ const(
 	blackIndex = 1 //next color in palette
 )
 
+//Main picture function
 func Lassajous(out io.Writer)  {
 	const(
 		cycles = 5 //number of complex x oscillator revolutions
