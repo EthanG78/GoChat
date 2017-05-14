@@ -156,7 +156,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		http.SetCookie(w, c)
 		dbSessions[c.Value] = un
 
-		//Genertaing random token for validations
+		//Generating random token for validations
 		h := md5.New()
 		crutime := int64(-42)
 		io.WriteString(h, strconv.FormatInt(crutime, 10))
@@ -185,13 +185,6 @@ func login(w http.ResponseWriter, req *http.Request) {
 //////////////////////
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "styling/favicon.ico")
-}
-
-////////////////////////////////
-//Handles lassajous animated gif
-////////////////////////////////
-func lassajousHandler(w http.ResponseWriter, r *http.Request) {
-	lib.Lassajous(w)
 }
 
 ///////////////////////
@@ -226,7 +219,6 @@ func main() {
 	router.HandleFunc("/signup", signUp)
 	router.HandleFunc("/login", login)
 	router.HandleFunc("/forbidden", forbidden)
-	router.HandleFunc("/lassajous", lassajousHandler)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", lib.WsHandler{H: H})
 	log.Println("serving on port 8080")
@@ -236,4 +228,4 @@ func main() {
 }
 
 //TODO Current build is beta v1.0, it was released on 1/29/2017
-//This version is not suer friendly, this will change:)
+//This version is not user friendly, this will change:)
