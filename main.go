@@ -16,26 +16,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-//MAIN
-
-///////////////
-//Create a user
-///////////////
+//User type referenced in DB
 type user struct {
 	UserName string
 	Pass     string
 }
 
-/////////////////////
-//Establish variables
-/////////////////////
+//Database and template variables
 var dbUsers = map[string]user{}
 var dbSessions = map[string]string{}
 var tpl *template.Template
 
-////////////////////////////
-//Initialize template reader
-////////////////////////////
+
+///
+//Initialize template reader as well as superuser
+///
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
 	//ADMIN USER: Admin:gochatadmin
@@ -59,6 +54,7 @@ func forbidden(w http.ResponseWriter, req *http.Request) {
 //Sign up function
 //////////////////
 func signUp(w http.ResponseWriter, req *http.Request) {
+	//Create cookie session
 	c, err := req.Cookie("session")
 	if err != nil {
 		sID := uuid.NewV4()
@@ -69,13 +65,13 @@ func signUp(w http.ResponseWriter, req *http.Request) {
 		http.SetCookie(w, c)
 	}
 
-	//Check form submission
+	//Checks if the user login is correct
 	var u user
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
 		p := req.FormValue("password")
 
-		//Checking to see if user filled out required fields.
+		//If the user does not submit anything, they will be redirected
 		if un == "" {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
@@ -86,7 +82,7 @@ func signUp(w http.ResponseWriter, req *http.Request) {
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
-		//Must declare password as a byte after error checking
+
 		pss := []byte(p)
 		password, err := bcrypt.GenerateFromPassword(pss, 0)
 		if err != nil {
@@ -116,6 +112,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		un := req.FormValue("username")
 		pass := req.FormValue("password")
 
+		//If the user does not submit anything, they will be redirected
 		if un == "" {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
@@ -126,19 +123,20 @@ func login(w http.ResponseWriter, req *http.Request) {
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
-		//Does this user exist?? Using comma ok idiom
+
+		//Checking to see if this user does in fact exist within the DataBase
 		u, ok := dbUsers[un]
 		if !ok {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
 			return
 		}
-		//does the username/password combo match at all??
-		//Compares bcrypt hash to user input!
+		//does the username/password combo match at all?
+		//Compares bcrypt hash to user input
 
-		password := []byte(pass)
+		pass2check := []byte(pass)
 		hash := []byte(u.Pass)
-		err := bcrypt.CompareHashAndPassword(hash, password)
+		err := bcrypt.CompareHashAndPassword(hash, pass2check)
 		if err != nil {
 			time.Sleep(3000)
 			http.Redirect(w, req, "/forbidden", http.StatusSeeOther)
@@ -156,7 +154,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		http.SetCookie(w, c)
 		dbSessions[c.Value] = un
 
-		//Generating random token for validations
+		//Generating random token for validation
 		h := md5.New()
 		crutime := int64(-42)
 		io.WriteString(h, strconv.FormatInt(crutime, 10))
@@ -183,22 +181,22 @@ func login(w http.ResponseWriter, req *http.Request) {
 //////////////////////
 //Handles site favicon
 //////////////////////
-func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "styling/favicon.ico")
+func faviconHandler(w http.ResponseWriter, req *http.Request) {
+	http.ServeFile(w, req, "styling/favicon.ico")
 }
 
 ///////////////////////
 //Handles the home page
 ///////////////////////
-func home(w http.ResponseWriter, r *http.Request) {
+func home(w http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(w, "home.gohtml", nil)
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/" {
-		home(w, r)
+func rootHandler(w http.ResponseWriter, req *http.Request) {
+	if req.URL.Path == "/" {
+		home(w, req)
 	} else {
-		log.Printf("rootHandler: Could not forward request for %s any further.", r.RequestURI)
+		log.Printf("rootHandler: Could not forward request for %s any further.", req.RequestURI)
 	}
 }
 
@@ -208,7 +206,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	//Wrapping handlers
-
 	flag.Parse()
 	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
 	H := lib.NewHub()
