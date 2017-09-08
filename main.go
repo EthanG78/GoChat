@@ -32,7 +32,7 @@ var tpl *template.Template
 //Initialize template reader as well as superuser
 ///
 func init() {
-	tpl = template.Must(template.ParseGlob("templates/*"))
+	tpl = template.Must(template.ParseGlob("static/*"))
 	//ADMIN USER: Admin:gochatadmin
 	dbUsers["Admin"] = user{"Admin", "$2a$10$5xymUNPSZfAm.XztfVCqUuC3MYLTPJ.dbXhGFsAJGaqyXoHteR8TO"}
 }
@@ -207,7 +207,7 @@ func main() {
 
 	//Wrapping handlers
 	flag.Parse()
-	tpl := template.Must(template.ParseFiles("templates/chat.gohtml"))
+	tpl := template.Must(template.ParseFiles("static/chat.gohtml"))
 	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
