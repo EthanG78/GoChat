@@ -23,9 +23,10 @@ type user struct {
 	Pass     		string		`json:"pass"`
 }
 
-type TemplateRenderer struct{
-	template *template.Template
+type Template struct {
+	templates *template.Template
 }
+
 
 //Database and template variables
 var dbUsers = map[string]user{}
@@ -33,20 +34,9 @@ var dbSessions = map[string]string{}
 var tpl *template.Template
 
 
-///
-//Initialize template reader as well as superuser
-///
-func init() {
-	tpl = template.Must(template.ParseGlob("static/*"))
-	//ADMIN USER: Admin:gochatadmin
-	dbUsers["Admin"] = user{"Admin", "$2a$10$5xymUNPSZfAm.XztfVCqUuC3MYLTPJ.dbXhGFsAJGaqyXoHteR8TO"}
-}
 
-func (t* TemplateRenderer) Renderer (w io.Writer, name string, data interface{}, c echo.Context) error{
-	if viewContext, isMap := data.(map[string]interface{}); isMap{
-		viewContext["reverse"] = c.Echo().Reverse
-	}
-	return t.template.ExecuteTemplate(w, name, data)
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 func homeHandler(tpl *template.Template) http.Handler {
@@ -216,6 +206,24 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 //MAIN
 //////
 func main() {
+
+	e := echo.New()
+
+	t := &Template{
+		templates: template.Must(template.ParseGlob("static/*.html")),
+
+	}
+	e.Renderer = t
+
+
+
+
+
+
+
+
+
+
 
 	//Wrapping handlers
 	flag.Parse()
