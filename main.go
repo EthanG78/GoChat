@@ -14,12 +14,17 @@ import (
 	"github.com/EthanG78/golang_chat/lib"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/labstack/echo"
 )
 
 //User type referenced in DB
 type user struct {
-	UserName string
-	Pass     string
+	Username 		string		`json:"username"`
+	Pass     		string		`json:"pass"`
+}
+
+type TemplateRenderer struct{
+	template *template.Template
 }
 
 //Database and template variables
@@ -35,6 +40,13 @@ func init() {
 	tpl = template.Must(template.ParseGlob("static/*"))
 	//ADMIN USER: Admin:gochatadmin
 	dbUsers["Admin"] = user{"Admin", "$2a$10$5xymUNPSZfAm.XztfVCqUuC3MYLTPJ.dbXhGFsAJGaqyXoHteR8TO"}
+}
+
+func (t* TemplateRenderer) Renderer (w io.Writer, name string, data interface{}, c echo.Context) error{
+	if viewContext, isMap := data.(map[string]interface{}); isMap{
+		viewContext["reverse"] = c.Echo().Reverse
+	}
+	return t.template.ExecuteTemplate(w, name, data)
 }
 
 func homeHandler(tpl *template.Template) http.Handler {
