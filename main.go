@@ -180,12 +180,6 @@ func login(w http.ResponseWriter, req *http.Request) {
 
 }
 
-//////////////////////
-//Handles site favicon
-//////////////////////
-func faviconHandler(w http.ResponseWriter, req *http.Request) {
-	http.ServeFile(w, req, "styling/favicon.ico")
-}
 
 ///////////////////////
 //Handles the home page
@@ -215,8 +209,14 @@ func main() {
 	}
 	e.Renderer = t
 
+	e.File("/favicon.ico", "styling/favicon.ico")
 
-
+	//TODO: Create endpoints for each WebPage
+	//TODO: Use uuidV4 for cookie checker and finish middleware
+	//TODO: Find a way to store cookies
+	//TODO: Figure out how to redirect using echo
+	//TODO: Assign groups, use logger, auth, server info and such
+	//TODO: How can I store users without using a DB?????
 
 
 
@@ -231,7 +231,6 @@ func main() {
 	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
-	router.HandleFunc("/favicon.ico", faviconHandler)
 	router.HandleFunc("/", rootHandler)
 	router.HandleFunc("/signup", signUp)
 	router.HandleFunc("/login", login)
