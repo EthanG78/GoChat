@@ -39,6 +39,11 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
+func home (c echo.Context) error{
+	return c.Render(http.StatusOK, "home.html", nil)
+}
+
+
 func homeHandler(tpl *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tpl.Execute(w, r)
@@ -181,21 +186,6 @@ func login(w http.ResponseWriter, req *http.Request) {
 }
 
 
-///////////////////////
-//Handles the home page
-///////////////////////
-func home(w http.ResponseWriter, req *http.Request) {
-	tpl.ExecuteTemplate(w, "home.gohtml", nil)
-}
-
-func rootHandler(w http.ResponseWriter, req *http.Request) {
-	if req.URL.Path == "/" {
-		home(w, req)
-	} else {
-		log.Printf("rootHandler: Could not forward request for %s any further.", req.RequestURI)
-	}
-}
-
 //////
 //MAIN
 //////
@@ -219,19 +209,25 @@ func main() {
 	//TODO: How can I store users without using a DB?????
 
 
+	//GROUPS
+
+	//MIDDLEWARE
+
+	//ENDPOINTS
+	e.GET("/", home)
+
+	//CREATE SERVER
+	e.Logger.Fatal(e.Start(":8080"))
 
 
 
 
-
-
-	//Wrapping handlers
+	//OLD CODE
 	flag.Parse()
 	tpl := template.Must(template.ParseFiles("static/chat.gohtml"))
 	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
-	router.HandleFunc("/", rootHandler)
 	router.HandleFunc("/signup", signUp)
 	router.HandleFunc("/login", login)
 	router.HandleFunc("/forbidden", forbidden)
