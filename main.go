@@ -15,6 +15,8 @@ import (
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/color"
 )
 
 //User type referenced in DB
@@ -34,6 +36,10 @@ func home (c echo.Context) error{
 	return c.String(http.StatusOK, "home")
 }
 
+func forbidden (c echo.Context) error{
+	return c.String(http.StatusUnauthorized, "Nice try buster, you are unauthorized!")
+}
+
 
 func homeHandler(tpl *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -41,12 +47,6 @@ func homeHandler(tpl *template.Template) http.Handler {
 	})
 }
 
-/////////////////////////
-//Redirects to error page
-/////////////////////////
-func forbidden(w http.ResponseWriter, req *http.Request) {
-	tpl.ExecuteTemplate(w, "forbidden.html", nil)
-}
 
 //////////////////
 //Sign up function
@@ -198,10 +198,17 @@ func main() {
 	//GROUPS
 
 	//MIDDLEWARE
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root: "static",
+		Browse: false,
+		Index: "home.html",
+	}))
 
 	//ENDPOINTS
 	e.GET("/", home)
 	e.File("/", "static/home.html")
+	e.GET("/401", forbidden)
+	e.File("/401", "/static/forbidden")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
