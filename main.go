@@ -23,11 +23,6 @@ type user struct {
 	Pass     		string		`json:"pass"`
 }
 
-type Template struct {
-	templates *template.Template
-}
-
-
 //Database and template variables
 var dbUsers = map[string]user{}
 var dbSessions = map[string]string{}
@@ -35,12 +30,8 @@ var tpl *template.Template
 
 
 
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
-}
-
 func home (c echo.Context) error{
-	return c.Render(http.StatusOK, "home.html", nil)
+	return c.String(http.StatusOK, "home")
 }
 
 
@@ -193,11 +184,6 @@ func main() {
 
 	e := echo.New()
 
-	t := &Template{
-		templates: template.Must(template.ParseGlob("static/*.html")),
-
-	}
-	e.Renderer = t
 
 	e.File("/favicon.ico", "styling/favicon.ico")
 
@@ -215,6 +201,7 @@ func main() {
 
 	//ENDPOINTS
 	e.GET("/", home)
+	e.File("/", "static/home.html")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
