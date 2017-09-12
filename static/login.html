@@ -31,13 +31,9 @@
 </head>
 <body>
 
-{{if .UserName}}
-<h1>You are logged in</h1>
-USERNAME: {{.UserName}}<br>
-PASSWORD: {{.Pass}}<br>
 
 
-{{else}}
+
 <div id="return"><a href="/" class="link">Return Home</a></div></br>
 <h1 id="title">LOGIN</h1>
 <form method="post">
@@ -46,6 +42,6 @@ PASSWORD: {{.Pass}}<br>
    <input type="password" name="password" placeholder="password">
    <input type="submit">
 </form>
-{{end}}
+
 </body>
 </html>

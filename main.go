@@ -45,7 +45,7 @@ func homeHandler(tpl *template.Template) http.Handler {
 //Redirects to error page
 /////////////////////////
 func forbidden(w http.ResponseWriter, req *http.Request) {
-	tpl.ExecuteTemplate(w, "forbidden.gohtml", nil)
+	tpl.ExecuteTemplate(w, "forbidden.html", nil)
 }
 
 //////////////////
@@ -99,7 +99,7 @@ func signUp(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
+	tpl.ExecuteTemplate(w, "signup.html", nil)
 }
 
 ////////////////
@@ -172,7 +172,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	tpl.ExecuteTemplate(w, "login.gohtml", nil)
+	tpl.ExecuteTemplate(w, "login.html", nil)
 
 }
 
@@ -211,7 +211,7 @@ func main() {
 
 	//OLD CODE
 	flag.Parse()
-	tpl := template.Must(template.ParseFiles("static/chat.gohtml"))
+	tpl := template.Must(template.ParseFiles("static/chat.html"))
 	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
