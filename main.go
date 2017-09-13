@@ -16,13 +16,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/labstack/gommon/color"
 )
 
 //User type referenced in DB
 type user struct {
 	Username 		string		`json:"username"`
-	Pass     		string		`json:"pass"`
+	Pass     		[]byte		`json:"pass"`
 }
 
 //Database and template variables
@@ -40,6 +39,57 @@ func forbidden (c echo.Context) error{
 	return c.String(http.StatusUnauthorized, "Nice try buster, you are unauthorized!")
 }
 
+func signup (c echo.Context) error{
+	cookie := &http.Cookie{}
+	cookieValue := uuid.NewV4()
+
+	cookie.Name = "session_id"
+	cookie.Value = cookieValue.String()
+
+	c.SetCookie(cookie)
+
+	var u user
+	if c.Request().Method == http.MethodPost{
+		un := c.Request().FormValue("username")
+		p := c.Request().FormValue("password")
+
+
+		//TODO: Make an individual way of handling when users do not insert anything into the fields..
+		if un == "" {
+			time.Sleep(3000)
+			c.Redirect(http.StatusUnauthorized, "/401")
+		}
+		if p == ""{
+			time.Sleep(3000)
+			c.Redirect(http.StatusUnauthorized, "/401")
+		}
+		pByte := []byte(p)
+		finalP, err := bcrypt.GenerateFromPassword(pByte, 0)
+		if err != nil{
+			log.Fatalf("Error encrypting password: %v", err)
+			//This is probably really bad, should find a better way to handle it lmao
+		}
+
+		cookie.Value = un
+
+		u = user{un, finalP}
+
+		dbUsers[cookie.Value] = u
+		c.Redirect(http.StatusOK, "/login")
+
+
+		//FOR DEBUGGING
+		log.Println(dbUsers)
+
+		return c.String(http.StatusOK, "you have successfully signed up!")
+
+	}
+
+
+	return c.String(http.StatusBadRequest, "You could not be signed up")
+
+}
+
 
 func homeHandler(tpl *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -48,10 +98,12 @@ func homeHandler(tpl *template.Template) http.Handler {
 }
 
 
-//////////////////
-//Sign up function
-//////////////////
-func signUp(w http.ResponseWriter, req *http.Request) {
+
+
+
+//OLD FUNCTION
+
+/*func signUp(w http.ResponseWriter, req *http.Request) {
 	//Create cookie session
 	c, err := req.Cookie("session")
 	if err != nil {
@@ -100,7 +152,7 @@ func signUp(w http.ResponseWriter, req *http.Request) {
 	}
 
 	tpl.ExecuteTemplate(w, "signup.html", nil)
-}
+}*/
 
 ////////////////
 //Login function
@@ -208,7 +260,9 @@ func main() {
 	e.GET("/", home)
 	e.File("/", "static/home.html")
 	e.GET("/401", forbidden)
-	e.File("/401", "/static/forbidden")
+	e.File("/401", "static/forbidden")
+	e.GET("/signup", signup)
+	e.File("/signup", "static/signup")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
@@ -222,9 +276,7 @@ func main() {
 	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
-	router.HandleFunc("/signup", signUp)
 	router.HandleFunc("/login", login)
-	router.HandleFunc("/forbidden", forbidden)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", lib.WsHandler{H: H})
 	log.Println("serving on port 8080")
