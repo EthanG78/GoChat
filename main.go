@@ -19,13 +19,13 @@ import (
 )
 
 //User type referenced in DB
-type user struct {
+type User struct {
 	Username 		string		`json:"username"`
 	Pass     		[]byte		`json:"pass"`
 }
 
 //Database and template variables
-var dbUsers = map[string]user{}
+var dbUsers = map[string]User{}
 var dbSessions = map[string]string{}
 var tpl *template.Template
 
@@ -48,7 +48,7 @@ func signup (c echo.Context) error{
 
 	c.SetCookie(cookie)
 
-	var u user
+	var u User
 	if c.Request().Method == http.MethodPost{
 		un := c.Request().FormValue("username")
 		p := c.Request().FormValue("password")
@@ -72,7 +72,7 @@ func signup (c echo.Context) error{
 
 		cookie.Value = un
 
-		u = user{un, finalP}
+		u = User{un, finalP}
 
 		dbUsers[cookie.Value] = u
 		c.Redirect(http.StatusOK, "/login")
@@ -248,12 +248,28 @@ func main() {
 
 
 	//GROUPS
+	admin := e.Group("/admin")
+	login := e.Group("/login")
+
 
 	//MIDDLEWARE
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Root: "static",
 		Browse: false,
 		Index: "home.html",
+	}))
+
+	admin.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency}` + "\n",
+	}))
+
+	admin.Use(middleware.BasicAuth(func (username, password string, c echo.Context) (bool, error) {
+		//placeholders for now
+		if username == "Admin" && password == "admin"{
+			return true, nil
+		}
+
+		return false, nil
 	}))
 
 	//ENDPOINTS
