@@ -281,7 +281,6 @@ func main() {
 
 	//GROUPS
 	admin := e.Group("/admin")
-	login := e.Group("/login")
 
 
 	//MIDDLEWARE
@@ -311,6 +310,8 @@ func main() {
 	e.File("/401", "static/forbidden")
 	e.GET("/signup", signup)
 	e.File("/signup", "static/signup")
+	e.GET("/login", login)
+	e.File("/login", "static/login")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
@@ -324,13 +325,8 @@ func main() {
 	H := lib.NewHub()
 	router := http.NewServeMux()
 	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
-	router.HandleFunc("/login", login)
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", lib.WsHandler{H: H})
-	log.Println("serving on port 8080")
-	log.Println("Users:", dbUsers)
-	//log.Println("Sessions: ", dbSessions)
-	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 //TODO Current build is beta v1.0, it was released on 1/29/2017
