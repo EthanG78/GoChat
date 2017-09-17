@@ -1,13 +1,9 @@
 package main
 
 import (
-	"crypto/md5"
 	"flag"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"text/template"
 	"time"
 
@@ -35,7 +31,7 @@ func home (c echo.Context) error{
 	return c.String(http.StatusOK, "home")
 }
 
-func forbidden (c echo.Context) error{
+func four_o_one (c echo.Context) error{
 	return c.String(http.StatusUnauthorized, "Nice try buster, you are unauthorized!")
 }
 
@@ -88,6 +84,42 @@ func signup (c echo.Context) error{
 
 	return c.String(http.StatusBadRequest, "You could not be signed up")
 
+}
+
+func login (c echo.Context) error{
+	if c.Request().Method == http.MethodPost{
+		un := c.Request().FormValue("username")
+		p := c.Request().FormValue("password")
+
+		if un == "" {
+			time.Sleep(3000)
+			c.Redirect(http.StatusUnauthorized, "/401")
+		}
+		if p == "" {
+			time.Sleep(3000)
+			c.Redirect(http.StatusUnauthorized, "/401")
+		}
+
+		u, ok := dbUsers[un]
+		if !ok {
+			time.Sleep(3000)
+			c.Redirect(http.StatusUnauthorized, "/401")
+		}
+
+		inputPass := []byte(p)
+		userPass := u.Pass
+		err := bcrypt.CompareHashAndPassword(userPass, inputPass)
+		if err != nil{
+			time.Sleep(3000)
+			c.Redirect(http.StatusUnauthorized, "/401")
+			//This is in the case that they input the incorrect password
+		}
+
+		return c.String(http.StatusOK, "You have successfully logged in!")
+
+	}
+
+	return c.String(http.StatusBadRequest, "You could not log in")
 }
 
 
@@ -157,7 +189,7 @@ func homeHandler(tpl *template.Template) http.Handler {
 ////////////////
 //Login function
 ////////////////
-func login(w http.ResponseWriter, req *http.Request) {
+/*func login(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodPost {
 		un := req.FormValue("username")
 		pass := req.FormValue("password")
@@ -226,7 +258,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 
 	tpl.ExecuteTemplate(w, "login.html", nil)
 
-}
+}*/
 
 
 //////
@@ -275,7 +307,7 @@ func main() {
 	//ENDPOINTS
 	e.GET("/", home)
 	e.File("/", "static/home.html")
-	e.GET("/401", forbidden)
+	e.GET("/401", four_o_one)
 	e.File("/401", "static/forbidden")
 	e.GET("/signup", signup)
 	e.File("/signup", "static/signup")
