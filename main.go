@@ -14,18 +14,12 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
-//User type referenced in DB
 type User struct {
 	Username 		string		`json:"username"`
 	Pass     		[]byte		`json:"pass"`
 }
 
-//Database and template variables
 var dbUsers = map[string]User{}
-var dbSessions = map[string]string{}
-var tpl *template.Template
-
-
 
 func home (c echo.Context) error{
 	return c.String(http.StatusOK, "home")
@@ -35,7 +29,7 @@ func four_o_one (c echo.Context) error{
 	return c.String(http.StatusUnauthorized, "Nice try buster, you are unauthorized!")
 }
 
-func signup (c echo.Context) error{
+func sign_up (c echo.Context) error{
 	cookie := &http.Cookie{}
 	cookieValue := uuid.NewV4()
 
@@ -141,12 +135,12 @@ func main() {
 
 	e.File("/favicon.ico", "styling/favicon.ico")
 
-	//TODO: Create endpoints for each WebPage
 	//TODO: Use uuidV4 for cookie checker and finish middleware
 	//TODO: Find a way to store cookies
-	//TODO: Figure out how to redirect using echo
 	//TODO: Assign groups, use logger, auth, server info and such
 	//TODO: How can I store users without using a DB?????
+	//TODO: Maybe generate cookie during login? Then ask for it within the chat!
+	//TODO: I also really need to re-style the web pages... They are garbage
 
 
 	//GROUPS
@@ -177,11 +171,11 @@ func main() {
 	e.GET("/", home)
 	e.File("/", "static/home.html")
 	e.GET("/401", four_o_one)
-	e.File("/401", "static/forbidden")
-	e.GET("/signup", signup)
-	e.File("/signup", "static/signup")
+	e.File("/401", "static/forbidden.html")
+	e.GET("/signup", sign_up)
+	e.File("/signup", "static/signup.html")
 	e.GET("/login", login)
-	e.File("/login", "static/login")
+	e.File("/login", "static/login.html")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
