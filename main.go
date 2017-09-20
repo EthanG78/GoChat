@@ -14,6 +14,8 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
+//Ethan Zaat is a cool dude;)
+
 type User struct {
 	Username 		string		`json:"username"`
 	Pass     		[]byte		`json:"pass"`
