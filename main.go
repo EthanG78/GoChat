@@ -73,7 +73,7 @@ func sign_up (c echo.Context) error{
 		//FOR DEBUGGING
 		log.Println(dbUsers)
 
-		return c.String(http.StatusOK, "you have successfully signed up!")
+		//return c.String(http.StatusOK, "you have successfully signed up!")
 
 	}
 
@@ -152,8 +152,9 @@ func main() {
 	//MIDDLEWARE
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Root: "static",
-		Browse: false,
+		Browse: true,
 		Index: "home.html",
+		HTML5: true,
 	}))
 
 	admin.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{

@@ -29,8 +29,7 @@ func checkCookies (pipe echo.HandlerFunc) echo.HandlerFunc{
 
 		}
 
-		//Need to add the ability to read a users cookie value
-		if cookie.Value == "cookie_value"{
+		if cookie.Value == cookieVal{
 			return pipe(c)
 		}
 
