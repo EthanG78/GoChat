@@ -49,7 +49,7 @@ func sign_up (c echo.Context) error{
 		//TODO: Make an individual way of handling when users do not insert anything into the fields..
 		if un == "" {
 			time.Sleep(3000)
-			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusFound, "/401")
 			//Error checking for testing
 			if RedirectError != nil{
 				log.Printf("Error: %v", RedirectError)
@@ -57,7 +57,7 @@ func sign_up (c echo.Context) error{
 		}
 		if p == ""{
 			time.Sleep(3000)
-			RedirectError:= c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError:= c.Redirect(http.StatusFound, "/401")
 			//Error checking for testing
 			if RedirectError != nil{
 				log.Printf("Error: %v", RedirectError)
@@ -99,7 +99,7 @@ func login (c echo.Context) error{
 
 		if un == "" {
 			time.Sleep(3000)
-			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusFound, "/401")
 			//Error checking for testing
 			if RedirectError != nil{
 				log.Printf("Error: %v", RedirectError)
@@ -107,7 +107,7 @@ func login (c echo.Context) error{
 		}
 		if p == "" {
 			time.Sleep(3000)
-			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusFound, "/401")
 			//Error checking for testing
 			if RedirectError != nil{
 				log.Printf("Error: %v", RedirectError)
@@ -117,7 +117,7 @@ func login (c echo.Context) error{
 		u, ok := dbUsers[un]
 		if !ok {
 			time.Sleep(3000)
-			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusFound, "/401")
 			//Error checking for testing
 			if RedirectError != nil{
 				log.Printf("Error: %v", RedirectError)
@@ -129,7 +129,7 @@ func login (c echo.Context) error{
 		err := bcrypt.CompareHashAndPassword(userPass, inputPass)
 		if err != nil{
 			time.Sleep(3000)
-			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusFound, "/401")
 			//This is in the case that they input the incorrect password
 			//Error checking for testing
 			if RedirectError != nil{
