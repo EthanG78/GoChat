@@ -49,11 +49,19 @@ func sign_up (c echo.Context) error{
 		//TODO: Make an individual way of handling when users do not insert anything into the fields..
 		if un == "" {
 			time.Sleep(3000)
-			c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			//Error checking for testing
+			if RedirectError != nil{
+				log.Printf("Error: %v", RedirectError)
+			}
 		}
 		if p == ""{
 			time.Sleep(3000)
-			c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError:= c.Redirect(http.StatusUnauthorized, "/401")
+			//Error checking for testing
+			if RedirectError != nil{
+				log.Printf("Error: %v", RedirectError)
+			}
 		}
 		pByte := []byte(p)
 		finalP, err := bcrypt.GenerateFromPassword(pByte, 0)
@@ -62,18 +70,20 @@ func sign_up (c echo.Context) error{
 			//This is probably really bad, should find a better way to handle it lmao
 		}
 
-		cookie.Value = un
-
 		u = User{un, finalP}
 
-		dbUsers[cookie.Value] = u
-		c.Redirect(http.StatusOK, "/login")
+		dbUsers[un] = u
+		RedirectError := c.Redirect(http.StatusFound, "/login")
+		//Error checking for testing
+		if RedirectError != nil{
+			log.Printf("Error: %v", RedirectError)
+		}
 
 
 		//FOR DEBUGGING
 		log.Println(dbUsers)
 
-		//return c.String(http.StatusOK, "you have successfully signed up!")
+		return c.String(http.StatusOK, "you have successfully signed up!")
 
 	}
 
@@ -89,17 +99,29 @@ func login (c echo.Context) error{
 
 		if un == "" {
 			time.Sleep(3000)
-			c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			//Error checking for testing
+			if RedirectError != nil{
+				log.Printf("Error: %v", RedirectError)
+			}
 		}
 		if p == "" {
 			time.Sleep(3000)
-			c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			//Error checking for testing
+			if RedirectError != nil{
+				log.Printf("Error: %v", RedirectError)
+			}
 		}
 
 		u, ok := dbUsers[un]
 		if !ok {
 			time.Sleep(3000)
-			c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
+			//Error checking for testing
+			if RedirectError != nil{
+				log.Printf("Error: %v", RedirectError)
+			}
 		}
 
 		inputPass := []byte(p)
@@ -107,8 +129,18 @@ func login (c echo.Context) error{
 		err := bcrypt.CompareHashAndPassword(userPass, inputPass)
 		if err != nil{
 			time.Sleep(3000)
-			c.Redirect(http.StatusUnauthorized, "/401")
+			RedirectError := c.Redirect(http.StatusUnauthorized, "/401")
 			//This is in the case that they input the incorrect password
+			//Error checking for testing
+			if RedirectError != nil{
+				log.Printf("Error: %v", RedirectError)
+			}
+		}
+
+		RedirectError := c.Redirect(http.StatusFound, "/chat")
+		//Error checking for testing
+		if RedirectError != nil{
+			log.Printf("Error: %v", RedirectError)
 		}
 
 		return c.String(http.StatusOK, "You have successfully logged in!")
@@ -135,7 +167,7 @@ func main() {
 	e := echo.New()
 
 
-	e.File("/favicon.ico", "styling/favicon.ico")
+	e.File("/favicon.ico", "static/styling/favicon.ico")
 
 	//TODO: Use uuidV4 for cookie checker and finish middleware
 	//TODO: Find a way to store cookies
@@ -150,13 +182,6 @@ func main() {
 
 
 	//MIDDLEWARE
-	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root: "static",
-		Browse: true,
-		Index: "home.html",
-		HTML5: true,
-	}))
-
 	admin.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency}` + "\n",
 	}))
@@ -175,9 +200,9 @@ func main() {
 	e.File("/", "static/home.html")
 	e.GET("/401", four_o_one)
 	e.File("/401", "static/forbidden.html")
-	e.GET("/signup", sign_up)
+	e.POST("/signup", sign_up)
 	e.File("/signup", "static/signup.html")
-	e.GET("/login", login)
+	e.POST("/login", login)
 	e.File("/login", "static/login.html")
 
 	//CREATE SERVER
