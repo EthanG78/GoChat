@@ -11,6 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/satori/go.uuid"
 )
 
 //Ethan Zaat is a cool dude;)
@@ -18,6 +19,7 @@ import (
 type User struct {
 	Username 		string		`json:"username"`
 	Pass     		[]byte		`json:"pass"`
+	Cookie			string		`json:"cookie"`
 }
 
 var dbUsers = map[string]User{}
@@ -31,6 +33,13 @@ func four_o_one (c echo.Context) error{
 }
 
 func sign_up (c echo.Context) error{
+	cookie := &http.Cookie{}
+	cookie.Name = "user_id"
+	cookieID := uuid.NewV4()
+	cookie.Value = cookieID.String()
+
+	c.SetCookie(cookie)
+
 	var u User
 	if c.Request().Method == http.MethodPost{
 		un := c.Request().FormValue("username")
@@ -61,7 +70,7 @@ func sign_up (c echo.Context) error{
 			//This is probably really bad, should find a better way to handle it lmao
 		}
 
-		u = User{un, finalP}
+		u = User{un, finalP, cookie.Value}
 
 		dbUsers[un] = u
 		RedirectError := c.Redirect(http.StatusFound, "/login")
@@ -128,19 +137,13 @@ func login (c echo.Context) error{
 			}
 		}
 
-		cookie := &http.Cookie{}
-		cookie.Name = "session_id"
-		cookie.Value = mw.CookieVal
-
-
-		c.SetCookie(cookie)
-
 		RedirectError := c.Redirect(http.StatusFound, "/chat")
 		//Error checking for testing
 		if RedirectError != nil{
 			log.Printf("Error: %v", RedirectError)
 		}
 
+		log.Printf("SERVER: User %v has logged in\n", u.Username )
 		return c.String(http.StatusOK, "You have successfully logged in!")
 
 	}
@@ -170,11 +173,10 @@ func main() {
 	//TODO: Find a way to store cookies
 	//TODO: Assign groups, use logger, auth, server info and such
 	//TODO: How can I store users without using a DB?????
-	//TODO: Maybe generate cookie during login? Then ask for it within the chat!
 	//TODO: I also really need to re-style the web pages... They are garbage
 
+	//TODO: ADD SESSION COOKIES, so no random dude can access chat without logging in
 
-	//TODO: COOKIES IN LOGIN!!!!!! (please don't forget this)
 
 	//TODO: I also have to use echo's websockets... That's going to be brutal
 
