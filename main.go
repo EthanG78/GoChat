@@ -178,6 +178,8 @@ func main() {
 
 	//TODO: I also have to use echo's websockets... That's going to be brutal
 
+	//TODO: Create admin group and page
+
 
 	//GROUPS
 	admin := e.Group("/admin")
@@ -190,7 +192,7 @@ func main() {
 
 	admin.Use(middleware.BasicAuth(func (username, password string, c echo.Context) (bool, error) {
 		//placeholders for now
-		if username == "Admin" && password == "admin"{
+		if username == mw.AdminLogin && password == mw.AdminPassword{
 			return true, nil
 		}
 

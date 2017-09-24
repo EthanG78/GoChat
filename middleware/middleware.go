@@ -29,7 +29,7 @@ func checkCookies (pipe echo.HandlerFunc) echo.HandlerFunc{
 
 		}
 
-		if cookie.Value == cookieVal{
+		if cookie.Value == CookieVal{
 			return pipe(c)
 		}
 
