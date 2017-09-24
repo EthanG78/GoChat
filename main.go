@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"text/template"
 	"time"
-
+	mw "github.com/EthanG78/golang_chat/middleware"
 	"github.com/EthanG78/golang_chat/lib"
-	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -32,14 +31,6 @@ func four_o_one (c echo.Context) error{
 }
 
 func sign_up (c echo.Context) error{
-	cookie := &http.Cookie{}
-	cookieValue := uuid.NewV4()
-
-	cookie.Name = "session_id"
-	cookie.Value = cookieValue.String()
-
-	c.SetCookie(cookie)
-
 	var u User
 	if c.Request().Method == http.MethodPost{
 		un := c.Request().FormValue("username")
@@ -137,6 +128,13 @@ func login (c echo.Context) error{
 			}
 		}
 
+		cookie := &http.Cookie{}
+		cookie.Name = "session_id"
+		cookie.Value = mw.CookieVal
+
+
+		c.SetCookie(cookie)
+
 		RedirectError := c.Redirect(http.StatusFound, "/chat")
 		//Error checking for testing
 		if RedirectError != nil{
@@ -169,12 +167,16 @@ func main() {
 
 	e.File("/favicon.ico", "static/styling/favicon.ico")
 
-	//TODO: Use uuidV4 for cookie checker and finish middleware
 	//TODO: Find a way to store cookies
 	//TODO: Assign groups, use logger, auth, server info and such
 	//TODO: How can I store users without using a DB?????
 	//TODO: Maybe generate cookie during login? Then ask for it within the chat!
 	//TODO: I also really need to re-style the web pages... They are garbage
+
+
+	//TODO: COOKIES IN LOGIN!!!!!! (please don't forget this)
+
+	//TODO: I also have to use echo's websockets... That's going to be brutal
 
 
 	//GROUPS
