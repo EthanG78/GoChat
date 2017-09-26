@@ -152,16 +152,11 @@ func login (c echo.Context) error{
 }
 
 func chat (c echo.Context) error{
-	//template.Must(template.ParseGlob("static/chat.html"))
-	return c.String(http.StatusOK, "Welcome to the chat!")
+	tpl := template.Must(template.ParseGlob("static/chat.html"))
+	tpl.Execute(c.Response(), c.Request())
+	return c.String(http.StatusOK, "")
 }
 
-
-func homeHandler(tpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tpl.Execute(w, r)
-	})
-}
 
 
 
@@ -222,7 +217,6 @@ func main() {
 	e.POST("/login", login)
 	e.File("/login", "static/login.html")
 	e.GET("/chat", chat)
-	e.File("/chat", "static/chat.html")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
@@ -232,4 +226,3 @@ func main() {
 }
 
 //TODO: Current build is beta v1.0, it was released on 1/29/2017
-//This version is not user friendly, this will change:)
