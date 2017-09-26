@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net"
 
+	"github.com/labstack/echo"
 )
 
 //////////////////////
@@ -49,7 +50,7 @@ type WsHandler struct {
 	H *Hub
 }
 
-func (wsh WsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+/*func (wsh WsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	//Find users IP and display them
 	ip,_,_ := net.SplitHostPort(r.RemoteAddr)
@@ -70,5 +71,31 @@ func (wsh WsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	go c.reader(&wg, wsConn)
 	wg.Wait()
 	wsConn.Close()
+}*/
+
+func Chat(c echo.Context)error {
+
+	//Find users IP and display them
+	ip,_,_ := net.SplitHostPort(c.Request().RemoteAddr)
+	log.Printf("%s has connected", ip)
+
+
+	wsConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		log.Printf("error upgrading %s", err)
+		return c.String(http.StatusInternalServerError, "Error upgrading web socket")
+	}
+	con := &connection{send: make(chan []byte, 256), h: NewHub()}
+	con.h.addConnection(con)
+	defer con.h.removeConnection(con)
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go con.writer(&wg, wsConn)
+	go con.reader(&wg, wsConn)
+	wg.Wait()
+	wsConn.Close()
+
+	return c.String(http.StatusOK, "")
 }
+
 

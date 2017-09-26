@@ -171,6 +171,7 @@ func homeHandler(tpl *template.Template) http.Handler {
 func main() {
 
 	e := echo.New()
+	flag.Parse()
 
 
 	e.File("/favicon.ico", "static/styling/favicon.ico")
@@ -207,6 +208,9 @@ func main() {
 	}))
 
 	//WEBSOCKETS
+	/*H := lib.NewHub()
+	WsHandler := lib.WsHandler{H:H}*/
+	e.GET("/ws", lib.Chat)
 
 	//ENDPOINTS
 	e.GET("/", home)
@@ -225,14 +229,6 @@ func main() {
 
 
 
-
-	//OLD CODE
-	flag.Parse()
-	tpl := template.Must(template.ParseFiles("static/chat.html"))
-	H := lib.NewHub()
-	router := http.NewServeMux()
-	router.Handle("/chat", homeHandler(tpl))
-	router.Handle("/ws", lib.WsHandler{H: H})
 }
 
 //TODO: Current build is beta v1.0, it was released on 1/29/2017
