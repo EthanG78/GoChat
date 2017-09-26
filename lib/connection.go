@@ -50,6 +50,35 @@ type WsHandler struct {
 	H *Hub
 }
 
+func Chat(c echo.Context)error {
+
+	H := NewHub()
+	wsHandler := WsHandler{H:H}
+
+	//Find users IP and display them
+	ip,_,_ := net.SplitHostPort(c.Request().RemoteAddr)
+	log.Printf("%s has connected", ip)
+
+
+	wsConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		log.Printf("error upgrading %s", err)
+		return c.String(http.StatusInternalServerError, "Error upgrading web socket")
+	}
+	con := &connection{send: make(chan []byte, 256), h: wsHandler.H}
+	con.h.addConnection(con)
+	defer con.h.removeConnection(con)
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go con.writer(&wg, wsConn)
+	go con.reader(&wg, wsConn)
+	wg.Wait()
+	wsConn.Close()
+
+	return c.String(http.StatusOK, "")
+}
+
+
 /*func (wsh WsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	//Find users IP and display them
@@ -72,30 +101,3 @@ type WsHandler struct {
 	wg.Wait()
 	wsConn.Close()
 }*/
-
-func Chat(c echo.Context)error {
-
-	//Find users IP and display them
-	ip,_,_ := net.SplitHostPort(c.Request().RemoteAddr)
-	log.Printf("%s has connected", ip)
-
-
-	wsConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-	if err != nil {
-		log.Printf("error upgrading %s", err)
-		return c.String(http.StatusInternalServerError, "Error upgrading web socket")
-	}
-	con := &connection{send: make(chan []byte, 256), h: NewHub()}
-	con.h.addConnection(con)
-	defer con.h.removeConnection(con)
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go con.writer(&wg, wsConn)
-	go con.reader(&wg, wsConn)
-	wg.Wait()
-	wsConn.Close()
-
-	return c.String(http.StatusOK, "")
-}
-
-
