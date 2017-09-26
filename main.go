@@ -143,12 +143,17 @@ func login (c echo.Context) error{
 			log.Printf("Error: %v", RedirectError)
 		}
 
-		log.Printf("SERVER: User %v has logged in\n", u.Username )
+		log.Printf("SERVER: User '%v' has logged in\n", u.Username )
 		return c.String(http.StatusOK, "You have successfully logged in!")
 
 	}
 
 	return c.String(http.StatusBadRequest, "You could not log in")
+}
+
+func chat (c echo.Context) error{
+	//template.Must(template.ParseGlob("static/chat.html"))
+	return c.String(http.StatusOK, "Welcome to the chat!")
 }
 
 
@@ -201,6 +206,8 @@ func main() {
 		return false, nil
 	}))
 
+	//WEBSOCKETS
+
 	//ENDPOINTS
 	e.GET("/", home)
 	e.File("/", "static/home.html")
@@ -210,6 +217,8 @@ func main() {
 	e.File("/signup", "static/signup.html")
 	e.POST("/login", login)
 	e.File("/login", "static/login.html")
+	e.GET("/chat", chat)
+	e.File("/chat", "static/chat.html")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
@@ -222,10 +231,9 @@ func main() {
 	tpl := template.Must(template.ParseFiles("static/chat.html"))
 	H := lib.NewHub()
 	router := http.NewServeMux()
-	router.Handle("/styling/", http.StripPrefix("/styling/", http.FileServer(http.Dir("styling/"))))
 	router.Handle("/chat", homeHandler(tpl))
 	router.Handle("/ws", lib.WsHandler{H: H})
 }
 
-//TODO Current build is beta v1.0, it was released on 1/29/2017
+//TODO: Current build is beta v1.0, it was released on 1/29/2017
 //This version is not user friendly, this will change:)
