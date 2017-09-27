@@ -19,10 +19,10 @@ import (
 type User struct {
 	Username 		string		`json:"username"`
 	Pass     		[]byte		`json:"pass"`
-	Cookie			string		`json:"cookie"`
 }
 
 var dbUsers = map[string]User{}
+var dbSessions = map[string]string{}
 
 func home (c echo.Context) error{
 	return c.String(http.StatusOK, "home")
@@ -33,13 +33,6 @@ func four_o_one (c echo.Context) error{
 }
 
 func sign_up (c echo.Context) error{
-	cookie := &http.Cookie{}
-	cookie.Name = "user_id"
-	cookieID := uuid.NewV4()
-	cookie.Value = cookieID.String()
-
-	c.SetCookie(cookie)
-
 	var u User
 	if c.Request().Method == http.MethodPost{
 		un := c.Request().FormValue("username")
@@ -63,14 +56,26 @@ func sign_up (c echo.Context) error{
 				log.Printf("Error: %v", RedirectError)
 			}
 		}
-		pByte := []byte(p)
-		finalP, err := bcrypt.GenerateFromPassword(pByte, 0)
+		if _, ok := dbUsers[un]; ok {
+			return c.String(http.StatusForbidden, "Username has alreaedy been taken")
+		}
+
+		sessionID := uuid.NewV4()
+		cookie := &http.Cookie{}
+		cookie.Name = "session_id"
+		cookie.Value = sessionID.String()
+		c.SetCookie(cookie)
+
+		dbSessions[cookie.Value] = un
+
+
+		finalP, err := bcrypt.GenerateFromPassword([]byte(p), 0)
 		if err != nil{
 			log.Fatalf("Error encrypting password: %v", err)
 			//This is probably really bad, should find a better way to handle it lmao
 		}
 
-		u = User{un, finalP, cookie.Value}
+		u = User{un, finalP}
 
 		dbUsers[un] = u
 		RedirectError := c.Redirect(http.StatusFound, "/login")
@@ -82,6 +87,7 @@ func sign_up (c echo.Context) error{
 
 		//FOR DEBUGGING
 		log.Println(dbUsers)
+		log.Println(dbSessions)
 
 		return c.String(http.StatusOK, "you have successfully signed up!")
 
@@ -124,9 +130,7 @@ func login (c echo.Context) error{
 			}
 		}
 
-		inputPass := []byte(p)
-		userPass := u.Pass
-		err := bcrypt.CompareHashAndPassword(userPass, inputPass)
+		err := bcrypt.CompareHashAndPassword(u.Pass, []byte(p))
 		if err != nil{
 			time.Sleep(3000)
 			RedirectError := c.Redirect(http.StatusFound, "/401")
@@ -136,6 +140,14 @@ func login (c echo.Context) error{
 				log.Printf("Error: %v", RedirectError)
 			}
 		}
+
+		cookie := &http.Cookie{}
+		sessionID := uuid.NewV4()
+		cookie.Name = "session_id"
+		cookie.Value = sessionID.String()
+		c.SetCookie(cookie)
+
+		dbSessions[cookie.Value] = un
 
 		RedirectError := c.Redirect(http.StatusFound, "/chat")
 		//Error checking for testing
@@ -203,8 +215,6 @@ func main() {
 	}))
 
 	//WEBSOCKETS
-	/*H := lib.NewHub()
-	WsHandler := lib.WsHandler{H:H}*/
 	e.GET("/ws", lib.Chat)
 
 	//ENDPOINTS
