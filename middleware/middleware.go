@@ -33,6 +33,6 @@ func CheckCookies(pipe echo.HandlerFunc) echo.HandlerFunc {
 			return pipe(c)
 		}
 
-		return c.String(http.StatusUnauthorized, "You do not have the correct cookie")
+		return c.String(http.StatusUnauthorized, "You don't have any cookies")
 	}
 }

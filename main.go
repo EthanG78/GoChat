@@ -229,7 +229,6 @@ func main() {
 	e.File("/login", "static/login.html")
 	chat.GET("/", chatMain)
 	admin.GET("/", adminMain)
-	//admin.File("/", "static/admin.html")
 
 	//CREATE SERVER
 	e.Logger.Fatal(e.Start(":8080"))
